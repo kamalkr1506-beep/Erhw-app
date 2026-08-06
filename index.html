@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3a7a">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ERHW MVP - منصة السلامة المرورية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--p:#1a3a7a;--pd:#0d1f4a;--a:#f5c518;--d:#f44336;--s:#4CAF50;--w:#ff9800;--i:#2196F3;--bg:#f0f4f8;--c:#fff;--t:#1a1a2e}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg);box-shadow:0 0 60px rgba(0,0,0,.1)}
+
+/* AUTH */
+.auth-screen{position:fixed;inset:0;z-index:5000;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;transition:opacity .5s,transform .5s}
+.auth-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+.auth-logo{width:90px;height:90px;background:#fff;border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.auth-title{color:#fff;font-size:28px;font-weight:800;margin-bottom:6px}
+.auth-sub{color:rgba(255,255,255,.7);font-size:14px;margin-bottom:32px;text-align:center;line-height:1.6}
+.auth-box{width:100%;max-width:340px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:24px;backdrop-filter:blur(10px)}
+.auth-tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(255,255,255,.1);border-radius:12px;padding:4px}
+.auth-tab{flex:1;padding:10px;border:none;border-radius:10px;background:transparent;color:rgba(255,255,255,.6);font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s}
+.auth-tab.active{background:var(--a);color:var(--pd);box-shadow:0 4px 15px rgba(245,197,24,.3)}
+.input-g{margin-bottom:14px}
+.input-g label{display:block;color:rgba(255,255,255,.85);font-size:12px;margin-bottom:5px;font-weight:600}
+.input-g input{width:100%;padding:13px 16px;border:2px solid rgba(255,255,255,.15);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-size:15px;font-family:Tajawal,sans-serif;outline:none;transition:all .2s}
+.input-g input:focus{border-color:var(--a);background:rgba(255,255,255,.15)}
+.input-g input::placeholder{color:rgba(255,255,255,.35)}
+.btn-p{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--a) 0%,#e6a800 100%);color:var(--pd);font-size:15px;font-weight:800;font-family:Tajawal;cursor:pointer;box-shadow:0 8px 25px rgba(245,197,24,.3);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-p:disabled{opacity:.5;cursor:not-allowed}
+.btn-s{width:100%;padding:14px;border:2px solid rgba(255,255,255,.2);border-radius:14px;background:transparent;color:#fff;font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-s:hover{background:rgba(255,255,255,.1)}
+.guest-link{display:block;text-align:center;color:rgba(255,255,255,.5);font-size:13px;margin-top:16px;cursor:pointer;text-decoration:underline}
+.otp-box{display:flex;gap:10px;justify-content:center;margin:16px 0;direction:ltr}
+.otp-box input{width:48px;height:56px;text-align:center;font-size:24px;font-weight:800;border:2px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-family:Tajawal;outline:none;transition:all .2s}
+.otp-box input:focus{border-color:var(--a);background:rgba(255,255,255,.15);transform:scale(1.05)}
+.otp-timer{color:rgba(255,255,255,.5);font-size:12px;text-align:center;margin-top:8px}
+.otp-timer span{color:var(--a);font-weight:700;cursor:pointer}
+.phone-display{background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center;color:#fff;font-size:16px;font-weight:700;margin-bottom:16px;letter-spacing:2px}
+
+/* QR MODAL */
+.qr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:4000;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:20px}
+.qr-overlay.open{opacity:1;pointer-events:auto}
+.qr-modal{background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:360px;text-align:center;transform:scale(.9);transition:transform .3s;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.qr-overlay.open .qr-modal{transform:scale(1)}
+.qr-modal h3{color:var(--p);font-size:20px;margin-bottom:6px}
+.qr-modal p{color:#888;font-size:13px;margin-bottom:20px}
+.qr-box{background:var(--bg);border-radius:16px;padding:20px;margin-bottom:20px;display:flex;justify-content:center}
+#qrcode img, #qrcode canvas{margin:0 auto;border-radius:8px}
+.qr-link{background:#f0f4fa;border-radius:12px;padding:12px 16px;font-size:13px;color:var(--p);font-weight:600;margin-bottom:16px;word-break:break-all;direction:ltr;text-align:center}
+.qr-actions{display:flex;gap:10px}
+.qr-actions button{flex:1;padding:14px;border:none;border-radius:14px;font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s}
+.qr-copy{background:var(--bg);color:var(--p);border:2px solid #e0e0e0}
+.qr-share{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);color:#fff;box-shadow:0 8px 25px rgba(26,58,122,.3)}
+.qr-close{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* APP */
+.app-h{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;position:sticky;top:0;z-index:100}
+.h-btn{background:none;border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.notif-badge{position:absolute;top:4px;left:4px;width:18px;height:18px;background:var(--d);border-radius:50%;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--p)}
+.h-title{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800}
+.drawer-o{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+.drawer-o.open{opacity:1;pointer-events:auto}
+.side-d{position:fixed;top:0;right:0;width:280px;height:100%;background:#fff;z-index:210;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-5px 0 30px rgba(0,0,0,.15)}
+.side-d.open{transform:translateX(0)}
+.d-h{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);padding:24px 20px 20px;position:relative}
+.d-close{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:16px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.d-user{display:flex;align-items:center;gap:14px;margin-top:8px}
+.d-avatar{width:56px;height:56px;border-radius:50%;border:3px solid var(--a);overflow:hidden;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:28px}
+.d-user-info h3{color:#fff;font-size:17px;font-weight:700}
+.d-user-info p{color:rgba(255,255,255,.7);font-size:12px;margin-top:2px}
+.d-stats{display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.15)}
+.d-stat{text-align:center;flex:1}
+.d-stat .n{color:var(--a);font-size:18px;font-weight:800}
+.d-stat .l{color:rgba(255,255,255,.7);font-size:10px}
+.d-body{flex:1;overflow-y:auto;padding:8px 0}
+.d-sec{font-size:11px;color:#888;font-weight:700;padding:16px 20px 6px}
+.d-item{display:flex;align-items:center;gap:14px;padding:14px 20px;margin:2px 12px;border-radius:14px;cursor:pointer;transition:all .2s;position:relative}
+.d-item:hover,.d-item.active{background:#f0f4fa}
+.d-item.active::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:4px;height:24px;background:var(--p);border-radius:4px 0 0 4px}
+.d-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.d-icon.b{background:#e3f2fd}.d-icon.g{background:#e8f5e9}.d-icon.o{background:#fff3e0}.d-icon.r{background:#ffebee}.d-icon.p{background:#f3e5f5}.d-icon.c{background:#e0f7fa}.d-icon.gr{background:#f5f5f5}.d-icon.y{background:#fff8e1}
+.d-text{flex:1}
+.d-text span{display:block;color:var(--p);font-size:14px;font-weight:700}
+.d-text small{display:block;color:#888;font-size:11px;margin-top:2px}
+.d-arrow{color:#bbb;font-size:14px}
+.d-badge{background:var(--d);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.d-footer{padding:12px 20px 20px;border-top:1px solid #eee}
+.btn-logout{width:100%;padding:14px;border-radius:14px;border:2px solid #ffebee;background:#fff;color:var(--d);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:Tajawal}
+.ver{text-align:center;color:#bbb;font-size:11px;margin-top:10px}
+.screen{display:none;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.home-c{padding:16px}
+.welcome-c{background:var(--c);border-radius:20px;padding:20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.welcome-t h2{color:var(--p);font-size:22px;margin-bottom:4px}
+.welcome-t p{color:#666;font-size:14px}
+.avatar{width:52px;height:52px;border-radius:50%;border:3px solid var(--a);display:flex;align-items:center;justify-content:center;font-size:24px;background:#e3f2fd}
+.safety-c{background:var(--c);border-radius:20px;padding:28px 20px;text-align:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06);border:2px solid var(--s)}
+.safety-c.warn{border-color:var(--w)}.safety-c.dang{border-color:var(--d)}
+.s-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px}
+.s-icon.safe{background:#e8f5e9}.s-icon.warn{background:#fff8e1}.s-icon.dang{background:#ffebee}
+.safety-c h3{font-size:20px;margin-bottom:4px}
+.safety-c h3.safe{color:var(--s)}.safety-c h3.warn{color:var(--w)}.safety-c h3.dang{color:var(--d)}
+.safety-c p{color:#888;font-size:14px}
+.stats-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat-c{background:var(--c);border-radius:16px;padding:18px 12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.st-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px}
+.st-icon.b{background:#e3f2fd}.st-icon.p{background:#f3e5f5}.st-icon.r{background:#ffebee}.st-icon.c{background:#e0f7fa}
+.st-val{font-size:26px;font-weight:800;color:var(--p)}
+.st-unit{font-size:12px;color:#666}
+.st-lbl{font-size:12px;color:#888;margin-top:4px}
+#map-c{height:calc(100vh - 130px);position:relative}
+#map{width:100%;height:100%;z-index:1}
+.map-alert{position:absolute;top:12px;left:12px;right:12px;z-index:500;background:rgba(255,255,255,.95);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--d);font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.map-alert-b{background:#ffebee;padding:4px 10px;border-radius:20px;font-size:11px;margin-right:auto}
+.map-ctrl{position:absolute;bottom:100px;left:12px;display:flex;flex-direction:column;gap:8px;z-index:500}
+.map-btn{width:48px;height:48px;border-radius:14px;border:none;background:var(--c);color:var(--p);font-size:20px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center}
+.map-btn.p{background:var(--p);color:#fff}
+.speed-fab{position:absolute;bottom:100px;right:12px;z-index:500;width:72px;height:72px;background:var(--s);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 25px rgba(0,0,0,.2);border:4px solid #fff}
+.speed-fab.warn{background:var(--w)}.speed-fab.dang{background:var(--d)}
+.speed-fab .spd{font-size:22px;font-weight:800;line-height:1}.speed-fab .u{font-size:10px}
+.r-h{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);padding:14px 16px;display:flex;align-items:center;gap:12px;color:#fff}
+.r-h h2{font-size:18px;flex:1}
+.r-c{padding:20px 16px}
+.sec-t{text-align:center;color:var(--p);margin-bottom:20px;font-size:18px;font-weight:700}
+.hz-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.hz-c{background:var(--c);border-radius:16px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.hz-c.sel{border-color:var(--a);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.hz-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px}
+.hz-icon.r{background:#ffebee}.hz-icon.b{background:#e3f2fd}.hz-icon.db{background:var(--p);color:#fff}.hz-icon.p{background:#f3e5f5}.hz-icon.o{background:#fff3e0}.hz-icon.c{background:#e0f7fa}.hz-icon.br{background:#efebe9}
+.hz-c span{font-size:13px;color:var(--t);font-weight:600}
+.loc-d{background:var(--c);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.loc-r{display:flex;align-items:center;gap:10px;color:var(--p);font-size:13px;font-weight:600;padding:6px 0}
+.loc-r small{color:#888;font-weight:400}
+.btn-sub{width:100%;padding:18px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-family:Tajawal;box-shadow:0 8px 25px rgba(26,58,122,.3)}
+.btn-sub:disabled{opacity:.5;cursor:not-allowed}
+.alerts-l{padding:16px}
+.alert-i{background:var(--c);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-right:4px solid transparent;animation:slideIn .4s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.alert-i.dang{border-right-color:var(--d);background:#ffebee}
+.alert-i.warn{border-right-color:var(--w);background:#fff8e1}
+.alert-i.info{border-right-color:var(--i);background:#e3f2fd}
+.alert-i.suc{border-right-color:var(--s);background:#e8f5e9}
+.alert-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.alert-inf{flex:1}
+.alert-inf h4{font-size:15px;color:var(--p);margin-bottom:2px}
+.alert-inf p{font-size:13px;color:#555}
+.alert-t{font-size:10px;color:#aaa;margin-top:4px}
+.empty{text-align:center;padding:60px 20px;color:#888}
+.empty .em{font-size:64px;margin-bottom:16px}
+.empty h3{color:var(--p);font-size:18px;margin-bottom:8px}
+.reports-l{padding:16px}
+.rep-c{background:var(--c);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-right:4px solid var(--p)}
+.rep-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rep-h .ri{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.rep-h .rt{font-weight:700;color:var(--p);font-size:15px}
+.rep-h .rs{margin-right:auto;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:700}
+.rs.pen{background:#fff8e1;color:var(--w)}.rs.con{background:#e8f5e9;color:var(--s)}
+.rep-c p{color:#666;font-size:13px;margin-bottom:8px}
+.rep-c .rl{display:flex;align-items:center;gap:6px;color:#888;font-size:12px}
+.rep-c .rti{color:#bbb;font-size:11px;margin-top:8px;text-align:left}
+.prof-c{padding:16px}
+.prof-card{background:var(--c);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.prof-av{width:90px;height:90px;border-radius:50%;border:4px solid var(--a);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:40px;background:#e3f2fd}
+.prof-card h3{color:var(--p);font-size:22px;margin-bottom:4px}
+.prof-card p{color:#888;font-size:14px}
+.lvl{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fff8e1 0%,#ffecb3 100%);color:#f57c00;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;margin-top:10px}
+.prof-st{display:flex;justify-content:space-around;background:var(--c);border-radius:20px;padding:20px 16px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.p-st{text-align:center}
+.p-st .n{font-size:24px;font-weight:800;color:var(--p);display:block}
+.p-st .l{font-size:12px;color:#888}
+.menu-l{background:var(--c);border-radius:20px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.menu-i{display:flex;align-items:center;padding:18px 20px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background .2s}
+.menu-i:hover{background:#f8f9fa}.menu-i:last-child{border-bottom:none}
+.m-ic{width:40px;text-align:center;font-size:20px}
+.menu-i span:nth-child(2){flex:1;color:var(--t);font-size:15px;font-weight:600}
+.m-ar{color:#ccc;font-size:16px}
+.bot-nav{background:var(--c);display:flex;justify-content:space-around;padding:6px 0 10px;border-top:1px solid #eee;position:sticky;bottom:0;z-index:50}
+.nav-i{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#aaa;font-size:11px;font-family:Tajawal;padding:6px 10px;border-radius:12px;transition:all .2s;flex:1}
+.nav-i.active{color:var(--p);font-weight:700}
+.nav-i.hl{background:linear-gradient(135deg,var(--a) 0%,#e6a800 100%);color:var(--pd);font-weight:700;transform:translateY(-6px);box-shadow:0 8px 20px rgba(245,197,24,.4)}
+.nav-ic{font-size:22px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--p);color:#fff;padding:14px 24px;border-radius:14px;font-size:14px;font-weight:600;z-index:3000;opacity:0;transition:all .4s;box-shadow:0 10px 40px rgba(0,0,0,.2);white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.suc{background:var(--s)}.toast.err{background:var(--d)}.toast.warn{background:var(--w)}
+.leaflet-control-attribution{font-size:8px!important}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-logo">
+    <svg viewBox="0 0 40 40" width="50" height="50">
+      <path d="M20 2C12.268 2 6 8.268 6 16c0 10.5 14 22 14 22s14-11.5 14-22C34 8.268 27.732 2 20 2z" fill="#1a3a7a"/>
+      <rect x="14" y="10" width="12" height="8" rx="2" fill="#f5c518"/>
+      <circle cx="20" cy="18" r="3" fill="#f5c518"/>
+      <path d="M12 22h16v4H12z" fill="#f5c518"/>
+    </svg>
+  </div>
+  <div class="auth-title">ERHW</div>
+  <div class="auth-sub">منصة ذكاء السلامة المرورية<br>سجل دخولك أو أنشئ حسابك بخطوة واحدة</div>
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuth('login')">تسجيل الدخول</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchAuth('signup')">تسجيل جديد</button>
+    </div>
+    <div id="loginForm">
+      <div class="input-g"><label>رقم الهاتف</label><input type="tel" id="loginPhone" placeholder="05xxxxxxxx" maxlength="10"></div>
+      <button class="btn-p" onclick="doLogin()">🚀 دخول للمنصة</button>
+      <button class="btn-s" onclick="doGuest()">الدخول كزائر</button>
+    </div>
+    <div id="signupForm" style="display:none">
+      <div class="input-g"><label>الاسم الكامل</label><input type="text" id="regName" placeholder="محمد أحمد"></div>
+      <div class="input-g"><label>رقم الهاتف</label><input type="tel" id="regPhone" placeholder="05xxxxxxxx" maxlength="10"></div>
+      <button class="btn-p" onclick="startSignup()">📱 إرسال رمز التحقق</button>
+      <button class="btn-s" onclick="doGuest()">الدخول كزائر</button>
+    </div>
+    <div id="otpForm" style="display:none">
+      <div class="phone-display" id="otpPhoneDisplay">05xxxxxxxx</div>
+      <div class="input-g" style="text-align:center">
+        <label>أدخل رمز التحقق المكون من 4 أرقام</label>
+        <div class="otp-box">
+          <input type="tel" maxlength="1" id="otp1" oninput="otpInput(this,2)" onkeydown="otpBack(event,0)">
+          <input type="tel" maxlength="1" id="otp2" oninput="otpInput(this,3)" onkeydown="otpBack(event,1)">
+          <input type="tel" maxlength="1" id="otp3" oninput="otpInput(this,4)" onkeydown="otpBack(event,2)">
+          <input type="tel" maxlength="1" id="otp4" oninput="otpInput(this,5)" onkeydown="otpBack(event,3)">
+        </div>
+        <div class="otp-timer">لم يصلك الرمز؟ <span onclick="resendOTP()">إعادة الإرسال</span></div>
+      </div>
+      <button class="btn-p" onclick="verifyOTP()">✅ تأكيد التسجيل</button>
+      <button class="btn-s" onclick="backToSignup()">تعديل الرقم</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="qr-overlay" id="qrOverlay" onclick="closeQR(event)">
+  <button class="qr-close" onclick="closeQRDirect()">✕</button>
+  <div class="qr-modal">
+    <h3>📲 دعوة صديق</h3>
+    <p>امسح الكود أو شارك الرابط لتسجيل أصدقائك</p>
+    <div class="qr-box"><div id="qrcode"></div></div>
+    <div class="qr-link" id="qrLink">erhw.app/join</div>
+    <div class="qr-actions">
+      <button class="qr-copy" onclick="copyLink()">📋 نسخ</button>
+      <button class="qr-share" onclick="shareApp()">📤 مشاركة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drawer Overlay -->
+<div class="drawer-o" id="drawerO" onclick="closeDrawer()"></div>
+
+<!-- Side Drawer -->
+<div class="side-d" id="sideD">
+  <div class="d-h">
+    <button class="d-close" onclick="closeDrawer()">✕</button>
+    <div class="d-user">
+      <div class="d-avatar" id="dAvatar">👤</div>
+      <div class="d-user-info">
+        <h3 id="dName">زائر</h3>
+        <p id="dRole">عضو في مجتمع ERHW</p>
+      </div>
+    </div>
+    <div class="d-stats">
+      <div class="d-stat"><div class="n" id="dRep">0</div><div class="l">بلاغاتي</div></div>
+      <div class="d-stat"><div class="n" id="dPts">0</div><div class="l">نقاط</div></div>
+      <div class="d-stat"><div class="n" id="dLvl">1</div><div class="l">مستوى</div></div>
+    </div>
+  </div>
+  <div class="d-body">
+    <div class="d-sec">القائمة الرئيسية</div>
+    <div class="d-item active" onclick="navD('home')">
+      <div class="d-icon b">🏠</div>
+      <div class="d-text"><span>الرئيسية</span><small>نظرة عامة</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+    <div class="d-item" onclick="navD('map')">
+      <div class="d-icon g">🗺️</div>
+      <div class="d-text"><span>الخريطة</span><small>متابعة الطريق</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+    <div class="d-item" onclick="navD('report')">
+      <div class="d-icon o">📤</div>
+      <div class="d-text"><span>بلاغ جديد</span><small>أبلغ عن خطر</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+    <div class="d-item" onclick="navD('alerts')">
+      <div class="d-icon r">🔔</div>
+      <div class="d-text"><span>التنبيهات</span><small>البلاغات النشطة</small></div>
+      <div class="d-badge" id="dBadge">0</div>
+    </div>
+    <div class="d-item" onclick="navD('myreports')">
+      <div class="d-icon p">📋</div>
+      <div class="d-text"><span>بلاغاتي</span><small>سجل مساهماتي</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+    <div class="d-item" onclick="navD('profile')">
+      <div class="d-icon c">👤</div>
+      <div class="d-text"><span>الملف الشخصي</span><small>إدارة الحساب</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+    <div class="d-sec">المجتمع</div>
+    <div class="d-item" onclick="closeDrawer();openQR()">
+      <div class="d-icon y">📲</div>
+      <div class="d-text"><span>دعوة صديق</span><small>شارك التطبيق مع الآخرين</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+    <div class="d-sec">الإعدادات</div>
+    <div class="d-item" onclick="closeDrawer();toast('قيد التطوير','info')">
+      <div class="d-icon gr">⚙️</div>
+      <div class="d-text"><span>الإعدادات</span><small>تخصيص التطبيق</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+    <div class="d-item" onclick="closeDrawer();toast('قيد التطوير','info')">
+      <div class="d-icon gr">❓</div>
+      <div class="d-text"><span>المساعدة</span><small>أسئلة شائعة</small></div>
+      <div class="d-arrow">←</div>
+    </div>
+  </div>
+  <div class="d-footer">
+    <button class="btn-logout" onclick="doLogout()">🚪 تسجيل الخروج</button>
+    <div class="ver">ERHW MVP v3.0</div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="app-h">
+  <button class="h-btn" onclick="openDrawer()">☰</button>
+  <div class="h-title">
+    <svg viewBox="0 0 40 40" width="28" height="28">
+      <path d="M20 2C12.268 2 6 8.268 6 16c0 10.5 14 22 14 22s14-11.5 14-22C34 8.268 27.732 2 20 2z" fill="#fff"/>
+      <rect x="14" y="10" width="12" height="8" rx="2" fill="#f5c518"/>
+      <circle cx="20" cy="18" r="3" fill="#f5c518"/>
+      <path d="M12 22h16v4H12z" fill="#f5c518"/>
+    </svg>
+    ERHW
+  </div>
+  <button class="h-btn" onclick="navD('alerts')">
+    🔔
+    <span class="notif-badge" id="hBadge" style="display:none">0</span>
+  </button>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="home-c">
+    <div class="welcome-c">
+      <div class="welcome-t">
+        <h2 id="homeWelcome">أهلاً بك</h2>
+        <p>نظرة عامة على حالة الطريق</p>
+      </div>
+      <div class="avatar" id="homeAvatar">👤</div>
+    </div>
+    <div class="safety-c" id="safetyStatus">
+      <div class="s-icon safe">✅</div>
+      <h3 class="safe">الطريق آمن</h3>
+      <p>لا توجد بلاغات نشطة في منطقتك</p>
+    </div>
+    <div class="stats-g">
+      <div class="stat-c">
+        <div class="st-icon b">📊</div>
+        <div class="st-val" id="stTotal">0</div>
+        <div class="st-lbl">إجمالي البلاغات</div>
+      </div>
+      <div class="stat-c">
+        <div class="st-icon p">🛡️</div>
+        <div class="st-val" id="stActive">0</div>
+        <div class="st-lbl">بلاغات نشطة</div>
+      </div>
+      <div class="stat-c">
+        <div class="st-icon r">⚠️</div>
+        <div class="st-val" id="stDang">0</div>
+        <div class="st-lbl">مخاطر عالية</div>
+      </div>
+      <div class="stat-c">
+        <div class="st-icon c">👥</div>
+        <div class="st-val" id="stUsers">1</div>
+        <div class="st-lbl">مستخدمون نشطون</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div class="screen" id="screen-map">
+  <div id="map-c">
+    <div id="map"></div>
+    <div class="map-alert" id="mapAlert" style="display:none">
+      <span>⚠️</span>
+      <span id="mapAlertText">تنبيه أمامك!</span>
+      <span class="map-alert-b" id="mapAlertDist">200 م</span>
+    </div>
+    <div class="map-ctrl">
+      <button class="map-btn" onclick="locateMe()">📍</button>
+      <button class="map-btn p" onclick="showScreen('report')">📤</button>
+    </div>
+    <div class="speed-fab" id="speedFab">
+      <span class="spd" id="speedVal">--</span>
+      <span class="u">كم/س</span>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT -->
+<div class="screen" id="screen-report">
+  <div class="r-h">
+    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
+    <h2>بلاغ جديد</h2>
+  </div>
+  <div class="r-c">
+    <div class="sec-t">اختر نوع الخطر</div>
+    <div class="hz-g">
+      <div class="hz-c" onclick="selectHz(this,'حادث')"><div class="hz-icon r">💥</div><span>حادث مروري</span></div>
+      <div class="hz-c" onclick="selectHz(this,'ماء')"><div class="hz-icon b">💧</div><span>تجمع مياه</span></div>
+      <div class="hz-c" onclick="selectHz(this,'حفرة')"><div class="hz-icon db">🕳️</div><span>حفرة في الطريق</span></div>
+      <div class="hz-c" onclick="selectHz(this,'ضباب')"><div class="hz-icon p">🌫️</div><span>ضباب كثيف</span></div>
+      <div class="hz-c" onclick="selectHz(this,'عمل')"><div class="hz-icon o">🚧</div><span>أعمال صيانة</span></div>
+      <div class="hz-c" onclick="selectHz(this,'حيوان')"><div class="hz-icon c">🐪</div><span>حيوانات على الطريق</span></div>
+      <div class="hz-c" onclick="selectHz(this,'عطل')"><div class="hz-icon br">🚗</div><span>عطل مركبة</span></div>
+      <div class="hz-c" onclick="selectHz(this,'أخرى')"><div class="hz-icon g">⚠️</div><span>أخرى</span></div>
+    </div>
+    <div class="loc-d">
+      <div class="loc-r">📍 <span id="repLoc">جارٍ تحديد الموقع...</span></div>
+      <div class="loc-r">📝 <small>سيتم إرفاق موقعك الحالي تلقائياً</small></div>
+    </div>
+    <button class="btn-sub" id="btnSubmit" onclick="submitReport()" disabled>📤 إرسال البلاغ</button>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div class="screen" id="screen-alerts">
+  <div class="r-h">
+    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
+    <h2>التنبيهات</h2>
+  </div>
+  <div class="alerts-l" id="alertsList">
+    <div class="empty">
+      <div class="em">🔔</div>
+      <h3>لا توجد تنبيهات</h3>
+      <p>ستظهر هنا البلاغات النشطة في منطقتك</p>
+    </div>
+  </div>
+</div>
+
+<!-- MY REPORTS -->
+<div class="screen" id="screen-myreports">
+  <div class="r-h">
+    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
+    <h2>بلاغاتي</h2>
+  </div>
+  <div class="reports-l" id="myReportsList">
+    <div class="empty">
+      <div class="em">📋</div>
+      <h3>لا توجد بلاغات</h3>
+      <p>لم تقم بإرسال أي بلاغات بعد</p>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="screen-profile">
+  <div class="r-h">
+    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
+    <h2>الملف الشخصي</h2>
+  </div>
+  <div class="prof-c">
+    <div class="prof-card">
+      <div class="prof-av" id="profAvatar">👤</div>
+      <h3 id="profName">زائر</h3>
+      <p id="profPhone">--</p>
+      <div class="lvl" id="profLvl">⭐ المستوى 1</div>
+    </div>
+    <div class="prof-st">
+      <div class="p-st"><span class="n" id="profRep">0</span><span class="l">بلاغات</span></div>
+      <div class="p-st"><span class="n" id="profPts">0</span><span class="l">نقاط</span></div>
+      <div class="p-st"><span class="n" id="profRank">#--</span><span class="l">ترتيب</span></div>
+    </div>
+    <div class="menu-l">
+      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">📝</span><span>تعديل الملف الشخصي</span><span class="m-ar">‹</span></div>
+      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">🏆</span><span>الإنجازات</span><span class="m-ar">‹</span></div>
+      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">🔔</span><span>إعدادات الإشعارات</span><span class="m-ar">‹</span></div>
+      <div class="menu-i" onclick="openQR()"><span class="m-ic">📲</span><span>دعوة صديق</span><span class="m-ar">‹</span></div>
+      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">🌙</span><span>الوضع الليلي</span><span class="m-ar">‹</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bot-nav" id="botNav">
+  <button class="nav-i active" id="nav-home" onclick="showScreen('home')"><span class="nav-ic">🏠</span><span>الرئيسية</span></button>
+  <button class="nav-i" id="nav-map" onclick="showScreen('map');setTimeout(initMap,100)"><span class="nav-ic">🗺️</span><span>الخريطة</span></button>
+  <button class="nav-i hl" id="nav-report" onclick="showScreen('report')"><span class="nav-ic">📤</span><span>بلاغ</span></button>
+  <button class="nav-i" id="nav-alerts" onclick="showScreen('alerts')"><span class="nav-ic">🔔</span><span>تنبيهات</span></button>
+  <button class="nav-i" id="nav-profile" onclick="showScreen('profile')"><span class="nav-ic">👤</span><span>حسابي</span></button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+</div><!-- /app -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+
+// ==================== DATA ====================
+let currentUser = null;
+let map = null;
+let userMarker = null;
+let reports = JSON.parse(localStorage.getItem('erhw_reports') || '[]');
+let users = JSON.parse(localStorage.getItem('erhw_users') || '[]');
+let alerts = [];
+let watchId = null;
+let selectedHazard = null;
+let userPos = null;
+let pendingPhone = '';
+let pendingName = '';
+let generatedOTP = '';
+let qrCodeObj = null;
+const APP_URL = 'https://erhw.app/download'; // رابط التحميل (تجريبي)
+
+// ==================== AUTH SWITCH ====================
+function switchAuth(mode) {
+    document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+    document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+    document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+    document.getElementById('signupForm').style.display = mode === 'signup' ? 'block' : 'none';
+    document.getElementById('otpForm').style.display = 'none';
+}
+function validatePhone(phone) {
+    return /^05\d{8}$/.test(phone);
+}
+
+// ==================== LOGIN ====================
+function doLogin() {
+    const phone = document.getElementById('loginPhone').value.trim();
+    if (!validatePhone(phone)) {
+        toast('الرجاء إدخال رقم هاتف صحيح يبدأ بـ 05', 'err');
+        return;
+    }
+    const user = users.find(u => u.phone === phone);
+    if (!user) {
+        toast('رقم الهاتف غير مسجل. أنشئ حساباً جديداً', 'warn');
+        switchAuth('signup');
+        document.getElementById('regPhone').value = phone;
+        return;
+    }
+    currentUser = {
+        name: user.name,
+        phone: user.phone,
+        isGuest: false,
+        reports: user.reports || 0,
+        points: user.points || 0,
+        level: user.level || 1
+    };
+    localStorage.setItem('erhw_user', JSON.stringify(currentUser));
+    initApp();
+    toast('تم تسجيل الدخول! مرحباً ' + currentUser.name, 'suc');
+}
+
+// ==================== SIGNUP ====================
+function startSignup() {
+    const name = document.getElementById('regName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    if (!name || name.length < 2) {
+        toast('الرجاء إدخال الاسم الكامل', 'err');
+        return;
+    }
+    if (!validatePhone(phone)) {
+        toast('الرجاء إدخال رقم هاتف صحيح (05xxxxxxxx)', 'err');
+        return;
+    }
+    if (users.find(u => u.phone === phone)) {
+        toast('رقم الهاتف مسجل مسبقاً', 'warn');
+        switchAuth('login');
+        document.getElementById('loginPhone').value = phone;
+        return;
+    }
+    pendingPhone = phone;
+    pendingName = name;
+    generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    console.log('OTP for ' + phone + ': ' + generatedOTP);
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('otpForm').style.display = 'block';
+    document.getElementById('otpPhoneDisplay').textContent = phone;
+    toast('تم إرسال رمز التحقق! (تحقق من Console)', 'suc');
+    setTimeout(() => document.getElementById('otp1').focus(), 300);
+}
+
+// ==================== OTP ====================
+function otpInput(el, nextId) {
+    el.value = el.value.replace(/[^0-9]/g, '');
+    if (el.value.length === 1 && nextId <= 4) {
+        document.getElementById('otp' + nextId).focus();
+    }
+    if (nextId === 5) verifyOTP();
+}
+function otpBack(e, prevId) {
+    if (e.key === 'Backspace' && e.target.value === '' && prevId >= 1) {
+        document.getElementById('otp' + prevId).focus();
+    }
+}
+function resendOTP() {
+    generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    console.log('New OTP for ' + pendingPhone + ': ' + generatedOTP);
+    toast('تم إعادة الإرسال! (تحقق من Console)', 'suc');
+}
+function verifyOTP() {
+    const otp = document.getElementById('otp1').value + 
+                document.getElementById('otp2').value + 
+                document.getElementById('otp3').value + 
+                document.getElementById('otp4').value;
+    if (otp.length !== 4) {
+        toast('الرجاء إدخال الرمز كاملاً', 'err');
+        return;
+    }
+    if (otp !== generatedOTP) {
+        toast('رمز التحقق غير صحيح', 'err');
+        for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
+        document.getElementById('otp1').focus();
+        return;
+    }
+    const newUser = {
+        name: pendingName,
+        phone: pendingPhone,
+        reports: 0,
+        points: 0,
+        level: 1,
+        createdAt: new Date().toISOString()
+    };
+    users.push(newUser);
+    localStorage.setItem('erhw_users', JSON.stringify(users));
+    currentUser = {
+        name: pendingName,
+        phone: pendingPhone,
+        isGuest: false,
+        reports: 0,
+        points: 0,
+        level: 1
+    };
+    localStorage.setItem('erhw_user', JSON.stringify(currentUser));
+    pendingPhone = '';
+    pendingName = '';
+    generatedOTP = '';
+    document.getElementById('regName').value = '';
+    document.getElementById('regPhone').value = '';
+    for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
+    initApp();
+    toast('🎉 تم إنشاء حسابك بنجاح! مرحباً ' + currentUser.name, 'suc');
+}
+function backToSignup() {
+    document.getElementById('otpForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'block';
+    for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
+}
+
+// ==================== GUEST ====================
+function doGuest() {
+    currentUser = {
+        name: 'زائر',
+        phone: '',
+        isGuest: true,
+        reports: 0,
+        points: 0,
+        level: 1
+    };
+    localStorage.setItem('erhw_user', JSON.stringify(currentUser));
+    initApp();
+    toast('تم الدخول كزائر', 'suc');
+}
+
+// ==================== INIT APP ====================
+function initApp() {
+    const auth = document.getElementById('authScreen');
+    auth.classList.add('hidden');
+    setTimeout(() => { auth.style.display = 'none'; }, 500);
+    document.getElementById('dName').textContent = currentUser.name;
+    document.getElementById('dRole').textContent = currentUser.isGuest 
+        ? 'زائر في منصة ERHW' 
+        : 'عضو مسجل برقم ' + currentUser.phone;
+    document.getElementById('homeWelcome').textContent = 'أهلاً ' + currentUser.name;
+    document.getElementById('homeAvatar').textContent = '👤';
+    document.getElementById('profName').textContent = currentUser.name;
+    document.getElementById('profPhone').textContent = currentUser.isGuest ? 'زائر' : currentUser.phone;
+    updateStats();
+    updateReportsList();
+    updateAlerts();
+    updateHomeStats();
+    showScreen('home');
+    startLocationTracking();
+}
+
+// ==================== LOGOUT ====================
+function doLogout() {
+    currentUser = null;
+    localStorage.removeItem('erhw_user');
+    const auth = document.getElementById('authScreen');
+    auth.style.display = 'flex';
+    setTimeout(() => { auth.classList.remove('hidden'); }, 10);
+    document.getElementById('loginPhone').value = '';
+    document.getElementById('regName').value = '';
+    document.getElementById('regPhone').value = '';
+    for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
+    switchAuth('login');
+    closeDrawer();
+    toast('تم تسجيل الخروج', 'info');
+}
+
+// ==================== QR CODE ====================
+function openQR() {
+    const overlay = document.getElementById('qrOverlay');
+    overlay.classList.add('open');
+    document.getElementById('qrLink').textContent = APP_URL;
+
+    // Generate QR
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    qrCodeObj = new QRCode(qrContainer, {
+        text: APP_URL,
+        width: 180,
+        height: 180,
+        colorDark: '#1a3a7a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+    });
+}
+function closeQR(e) {
+    if (e && e.target !== document.getElementById('qrOverlay')) return;
+    document.getElementById('qrOverlay').classList.remove('open');
+}
+function closeQRDirect() {
+    document.getElementById('qrOverlay').classList.remove('open');
+}
+function copyLink() {
+    navigator.clipboard.writeText(APP_URL).then(() => {
+        toast('تم نسخ الرابط!', 'suc');
+    }).catch(() => {
+        toast('تعذر النسخ', 'err');
+    });
+}
+function shareApp() {
+    const shareData = {
+        title: 'ERHW - منصة السلامة المرورية',
+        text: 'انضم لمنصة ERHW وساهم في السلامة المرورية! 🚗🛡️',
+        url: APP_URL
+    };
+    if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+    } else {
+        copyLink();
+    }
+}
+
+// ==================== NAVIGATION ====================
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('screen-' + screenId);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
+    const navBtn = document.getElementById('nav-' + screenId);
+    if (navBtn) navBtn.classList.add('active');
+    const botNav = document.getElementById('botNav');
+    if (screenId === 'report' || screenId === 'alerts' || screenId === 'myreports' || screenId === 'profile') {
+        botNav.style.display = 'none';
+    } else {
+        botNav.style.display = 'flex';
+    }
+    if (screenId === 'map') setTimeout(initMap, 100);
+}
+
+// ==================== DRAWER ====================
+function openDrawer() {
+    document.getElementById('drawerO').classList.add('open');
+    document.getElementById('sideD').classList.add('open');
+}
+function closeDrawer() {
+    document.getElementById('drawerO').classList.remove('open');
+    document.getElementById('sideD').classList.remove('open');
+}
+function navD(screen) {
+    closeDrawer();
+    showScreen(screen);
+}
+
+// ==================== MAP ====================
+function initMap() {
+    if (map) { map.invalidateSize(); return; }
+    const mapEl = document.getElementById('map');
+    if (!mapEl) return;
+    map = L.map('map').setView([24.7136, 46.6753], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+    reports.forEach(r => {
+        if (r.lat && r.lng) {
+            const color = r.type === 'حادث' ? 'red' : r.type === 'حفرة' ? 'orange' : 'blue';
+            L.circleMarker([r.lat, r.lng], {
+                radius: 10, fillColor: color, color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.8
+            }).addTo(map).bindPopup('<b>' + r.type + '</b><br>' + r.time);
+        }
+    });
+    if (userPos) {
+        map.setView([userPos.lat, userPos.lng], 15);
+        userMarker = L.marker([userPos.lat, userPos.lng]).addTo(map);
+    }
+}
+function locateMe() {
+    if (!map || !userPos) return;
+    map.setView([userPos.lat, userPos.lng], 16);
+}
+
+// ==================== LOCATION TRACKING ====================
+function startLocationTracking() {
+    if (!navigator.geolocation) {
+        document.getElementById('repLoc').textContent = 'الموقع غير متوفر';
+        return;
+    }
+    watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+            userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            document.getElementById('repLoc').textContent = userPos.lat.toFixed(4) + ' , ' + userPos.lng.toFixed(4);
+            if (map) {
+                if (!userMarker) {
+                    userMarker = L.marker([userPos.lat, userPos.lng]).addTo(map);
+                } else {
+                    userMarker.setLatLng([userPos.lat, userPos.lng]);
+                }
+            }
+            const speed = pos.coords.speed;
+            const speedFab = document.getElementById('speedFab');
+            const speedVal = document.getElementById('speedVal');
+            if (speedVal) {
+                if (speed !== null && !isNaN(speed)) {
+                    const kmh = Math.round(speed * 3.6);
+                    speedVal.textContent = kmh;
+                    speedFab.classList.remove('warn', 'dang');
+                    if (kmh > 120) speedFab.classList.add('dang');
+                    else if (kmh > 80) speedFab.classList.add('warn');
+                } else {
+                    speedVal.textContent = '--';
+                }
+            }
+            checkNearbyAlerts();
+        },
+        (err) => { document.getElementById('repLoc').textContent = 'تعذر تحديد الموقع'; },
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+    );
+}
+
+// ==================== REPORT ====================
+function selectHz(el, type) {
+    document.querySelectorAll('.hz-c').forEach(c => c.classList.remove('sel'));
+    el.classList.add('sel');
+    selectedHazard = type;
+    document.getElementById('btnSubmit').disabled = false;
+}
+function submitReport() {
+    if (!selectedHazard) { toast('الرجاء اختيار نوع الخطر', 'err'); return; }
+    if (!userPos) { toast('جارٍ تحديد الموقع...', 'warn'); return; }
+    const report = {
+        id: Date.now(),
+        type: selectedHazard,
+        user: currentUser ? currentUser.name : 'زائر',
+        isGuest: currentUser ? currentUser.isGuest : true,
+        lat: userPos.lat,
+        lng: userPos.lng,
+        time: new Date().toLocaleString('ar-SA'),
+        status: 'pending'
+    };
+    reports.unshift(report);
+    localStorage.setItem('erhw_reports', JSON.stringify(reports));
+    if (currentUser && !currentUser.isGuest) {
+        currentUser.reports++;
+        currentUser.points += 10;
+        if (currentUser.points >= 50) currentUser.level = 2;
+        if (currentUser.points >= 150) currentUser.level = 3;
+        localStorage.setItem('erhw_user', JSON.stringify(currentUser));
+        const uIndex = users.findIndex(u => u.phone === currentUser.phone);
+        if (uIndex >= 0) {
+            users[uIndex].reports = currentUser.reports;
+            users[uIndex].points = currentUser.points;
+            users[uIndex].level = currentUser.level;
+            localStorage.setItem('erhw_users', JSON.stringify(users));
+        }
+    }
+    alerts.unshift({ type: selectedHazard, dist: 'قريب منك', time: 'الآن', level: selectedHazard === 'حادث' ? 'dang' : 'warn' });
+    updateStats();
+    updateReportsList();
+    updateAlerts();
+    updateHomeStats();
+    selectedHazard = null;
+    document.querySelectorAll('.hz-c').forEach(c => c.classList.remove('sel'));
+    document.getElementById('btnSubmit').disabled = true;
+    toast('تم إرسال البلاغ بنجاح! شكراً لمساهمتك', 'suc');
+    setTimeout(() => showScreen('home'), 800);
+}
+
+// ==================== STATS & UPDATES ====================
+function updateStats() {
+    const rep = currentUser ? currentUser.reports : 0;
+    const pts = currentUser ? currentUser.points : 0;
+    const lvl = currentUser ? currentUser.level : 1;
+    document.getElementById('dRep').textContent = rep;
+    document.getElementById('dPts').textContent = pts;
+    document.getElementById('dLvl').textContent = lvl;
+    document.getElementById('profRep').textContent = rep;
+    document.getElementById('profPts').textContent = pts;
+    document.getElementById('profLvl').textContent = '⭐ المستوى ' + lvl;
+}
+function updateHomeStats() {
+    document.getElementById('stTotal').textContent = reports.length;
+    document.getElementById('stActive').textContent = reports.filter(r => r.status === 'pending').length;
+    document.getElementById('stDang').textContent = reports.filter(r => r.type === 'حادث').length;
+    const safety = document.getElementById('safetyStatus');
+    const dangCount = reports.filter(r => r.type === 'حادث').length;
+    if (dangCount > 2) {
+        safety.className = 'safety-c dang';
+        safety.innerHTML = '<div class="s-icon dang">🚨</div><h3 class="dang">تحذير! مخاطر عالية</h3><p>يوجد ' + dangCount + ' بلاغات خطرة في المنطقة</p>';
+    } else if (reports.length > 0) {
+        safety.className = 'safety-c warn';
+        safety.innerHTML = '<div class="s-icon warn">⚠️</div><h3 class="warn">انتباه! بلاغات نشطة</h3><p>يوجد ' + reports.length + ' بلاغات في المنطقة</p>';
+    } else {
+        safety.className = 'safety-c';
+        safety.innerHTML = '<div class="s-icon safe">✅</div><h3 class="safe">الطريق آمن</h3><p>لا توجد بلاغات نشطة في منطقتك</p>';
+    }
+}
+function updateReportsList() {
+    const list = document.getElementById('myReportsList');
+    const myReps = reports.filter(r => currentUser && r.user === currentUser.name);
+    if (myReps.length === 0) {
+        list.innerHTML = '<div class="empty"><div class="em">📋</div><h3>لا توجد بلاغات</h3><p>لم تقم بإرسال أي بلاغات بعد</p></div>';
+        return;
+    }
+    list.innerHTML = myReps.map(r => `
+        <div class="rep-c">
+            <div class="rep-h">
+                <div class="ri" style="background:${r.type==='حادث'?'#ffebee':r.type==='حفرة'?'#fff3e0':'#e3f2fd'}">${r.type==='حادث'?'💥':r.type==='حفرة'?'🕳️':'⚠️'}</div>
+                <div class="rt">${r.type}</div>
+                <div class="rs ${r.status==='pending'?'pen':'con'}">${r.status==='pending'?'قيد المراجعة':'مغلق'}</div>
+            </div>
+            <p>${r.lat.toFixed(4)} , ${r.lng.toFixed(4)}</p>
+            <div class="rl">📍 ${r.time}</div>
+        </div>
+    `).join('');
+}
+function updateAlerts() {
+    const list = document.getElementById('alertsList');
+    const activeAlerts = alerts.slice(0, 10);
+    document.getElementById('dBadge').textContent = activeAlerts.length;
+    document.getElementById('hBadge').textContent = activeAlerts.length;
+    document.getElementById('hBadge').style.display = activeAlerts.length > 0 ? 'flex' : 'none';
+    if (activeAlerts.length === 0) {
+        list.innerHTML = '<div class="empty"><div class="em">🔔</div><h3>لا توجد تنبيهات</h3><p>ستظهر هنا البلاغات النشطة في منطقتك</p></div>';
+        return;
+    }
+    list.innerHTML = activeAlerts.map(a => `
+        <div class="alert-i ${a.level}">
+            <div class="alert-ic" style="background:${a.level==='dang'?'#ffebee':a.level==='warn'?'#fff8e1':'#e3f2fd'}">
+                ${a.level==='dang'?'🚨':a.level==='warn'?'⚠️':'ℹ️'}
+            </div>
+            <div class="alert-inf">
+                <h4>${a.type}</h4>
+                <p>${a.dist}</p>
+                <div class="alert-t">${a.time}</div>
+            </div>
+        </div>
+    `).join('');
+}
+function checkNearbyAlerts() {
+    if (!userPos || reports.length === 0) return;
+    let nearest = null;
+    let minDist = Infinity;
+    reports.forEach(r => {
+        if (!r.lat || !r.lng) return;
+        const d = Math.sqrt(Math.pow(r.lat - userPos.lat, 2) + Math.pow(r.lng - userPos.lng, 2));
+        if (d < minDist) { minDist = d; nearest = r; }
+    });
+    const mapAlert = document.getElementById('mapAlert');
+    if (nearest && minDist < 0.01) {
+        mapAlert.style.display = 'flex';
+        document.getElementById('mapAlertText').textContent = nearest.type + ' أمامك!';
+        document.getElementById('mapAlertDist').textContent = Math.round(minDist * 1000) + ' م';
+    } else {
+        mapAlert.style.display = 'none';
+    }
+}
+
+// ==================== TOAST ====================
+function toast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (type || '');
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ==================== ON LOAD ====================
+window.addEventListener('load', () => {
+    const saved = localStorage.getItem('erhw_user');
+    if (saved) {
+        currentUser = JSON.parse(saved);
+        initApp();
+    }
+    updateHomeStats();
+    document.getElementById('hBadge').style.display = 'none';
+});
+window.addEventListener('beforeunload', () => {
+    if (watchId) navigator.geolocation.clearWatch(watchId);
+});
+</script>
+
+<script>
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW error', err));
+  });
+}
+</script>
+</body>
+</html>
