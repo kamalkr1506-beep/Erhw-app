@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="icons/logo-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>ERHW - Road Safety Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -354,7 +354,7 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-heig
 
 <!-- AUTH SCREEN -->
 <div class="auth-screen" id="authScreen">
-  <div class="auth-logo"><img src="icons/logo.png" style="width:70%;height:70%;object-fit:contain;border-radius:16px"></div>
+  <div class="auth-logo"><img src="icons/favicon.png" style="width:70%;height:70%;object-fit:contain;border-radius:16px"></div>
   <div class="auth-title" data-i18n="appName">ERHW</div>
   <div class="auth-sub" data-i18n="authSub">منصة السلامة المرورية<br>للإبلاغ عن المخاطر وتحقيق قيادة آمنة</div>
 
@@ -440,7 +440,10 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-heig
 </div>
 
 <!-- VOICE SETTINGS -->
-
+<div class="voice-set hidden" id="voiceSettings">
+  <input type="checkbox" id="voiceToggle" checked onchange="Voice.toggle()">
+  <label for="voiceToggle" data-i18n="voiceAlerts">التنبيهات الصوتية</label>
+</div>
 
 <!-- INSTALL BANNER -->
 <div class="install-banner" id="installBanner">
@@ -463,7 +466,7 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-heig
 <div class="app-h" id="appHeader">
   <button class="h-btn" onclick="UI.toggleDrawer()">☰</button>
   <div class="h-title">
-    <img src="icons/logo.png" style="width:32px;height:32px;object-fit:contain;border-radius:8px">
+    <img src="icons/favicon.png" style="width:32px;height:32px;object-fit:contain;border-radius:8px">
     <span id="headerTitle" data-i18n="home">الرئيسية</span>
   </div>
   <button class="h-btn" onclick="Router.navigate('notifications')">
@@ -478,7 +481,7 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-heig
   <div class="d-h">
     <button class="d-close" onclick="UI.toggleDrawer()">✕</button>
     <div class="d-user">
-      <div class="d-avatar" id="drawerAvatar" style="padding:4px"><img src="icons/logo.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
+      <div class="d-avatar" id="drawerAvatar" style="padding:4px"><img src="icons/favicon.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
       <div class="d-user-info">
         <h3 id="drawerName">ضيف</h3>
         <p id="drawerPhone">--</p>
@@ -559,7 +562,7 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-heig
         <h2 id="welcomeName" data-i18n="welcome">أهلاً بك</h2>
         <p data-i18n="welcomeSub">نحن نعمل لجعل الطرق أكثر أماناً</p>
       </div>
-      <div class="avatar" id="homeAvatar" style="padding:4px"><img src="icons/logo.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
+      <div class="avatar" id="homeAvatar" style="padding:4px"><img src="icons/favicon.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
     </div>
 
     <div class="safety-c safe" id="safetyCard">
@@ -733,7 +736,7 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-heig
 <div class="screen" id="screen-profile">
   <div class="prof-c">
     <div class="prof-card">
-      <div class="prof-av" id="profAvatar" style="padding:6px"><img src="icons/logo.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
+      <div class="prof-av" id="profAvatar" style="padding:6px"><img src="icons/favicon.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
       <h3 id="profName">ضيف</h3>
       <p id="profPhone">--</p>
       <div class="lvl" id="profLevel">

@@ -1,15 +1,75 @@
 {
   "name": "ERHW - Road Safety Platform",
   "short_name": "ERHW",
-  "description": "Road Safety Platform for reporting hazards and safe driving",
+  "id": "com.erhw.road-safety",
+  "description": "ERHW - Road Safety Platform for reporting hazards and safe driving. Report accidents, road damage, traffic, weather conditions, and construction work in real-time.",
   "start_url": "/index.html",
-  "display": "standalone",
-  "background_color": "#000f23",
-  "theme_color": "#000f23",
-  "orientation": "portrait",
   "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "browser"
+  ],
+  "orientation": "portrait",
+  "theme_color": "#000f23",
+  "background_color": "#0a1929",
+  "dir": "rtl",
   "lang": "ar",
+  "categories": [
+    "navigation",
+    "utilities",
+    "travel"
+  ],
   "icons": [
+    {
+      "src": "icons/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "icons/logo-192.png",
       "sizes": "192x192",
@@ -17,19 +77,113 @@
       "purpose": "any maskable"
     },
     {
-      "src": "icons/logo-512.png",
+      "src": "icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["navigation", "utilities"],
   "screenshots": [
     {
-      "src": "icons/logo-512.png",
-      "sizes": "512x512",
+      "src": "screenshots/screenshot-1.png",
+      "sizes": "480x800",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "ERHW Home Screen"
+    },
+    {
+      "src": "screenshots/screenshot-2.png",
+      "sizes": "480x800",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ERHW Map View"
+    },
+    {
+      "src": "screenshots/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ERHW Wide View"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "بلاغ جديد",
+      "short_name": "بلاغ",
+      "description": "أرسل بلاغ عن خطر مروري",
+      "url": "/index.html?screen=report",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "الخريطة",
+      "short_name": "خريطة",
+      "description": "عرض مخاطر الطريق على الخريطة",
+      "url": "/index.html?screen=map",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "التنبيهات",
+      "short_name": "تنبيهات",
+      "description": "آخر التحذيرات المرورية",
+      "url": "/index.html?screen=alerts",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/index.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "url": "link",
+      "files": [
+        {
+          "name": "media",
+          "accept": [
+            "image/*"
+          ]
+        }
+      ]
+    }
+  },
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+erhw",
+      "url": "/index.html?report=%s"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce77e396"
 }

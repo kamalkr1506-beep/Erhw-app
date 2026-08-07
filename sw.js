@@ -3,8 +3,21 @@ const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './favicon.png',
+  './icons/favicon.png',
+  './icons/logo.png',
+  './icons/logo-192.png',
+  './icons/icon-72.png',
+  './icons/icon-96.png',
+  './icons/icon-128.png',
+  './icons/icon-144.png',
+  './icons/icon-152.png',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-384.png',
+  './icons/icon-512.png',
+  './screenshots/screenshot-1.png',
+  './screenshots/screenshot-2.png',
+  './screenshots/screenshot-wide.png'
 ];
 
 // Install: cache static assets
