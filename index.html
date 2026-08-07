@@ -1,75 +1,119 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="rootHtml">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1a3a7a">
+<meta name="theme-color" content="#000f23">
+<meta name="description" content="ERHW - Road Safety Platform for reporting hazards and safe driving">
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>ERHW MVP - منصة السلامة المرورية</title>
+<link rel="apple-touch-icon" href="icons/logo-192.png">
+<title>ERHW - Road Safety Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--p:#1a5f7a;--pd:#0d3d4a;--a:#2dd4bf;--d:#f44336;--s:#4CAF50;--w:#ff9800;--i:#2196F3;--bg:#f0f4f8;--c:#fff;--t:#1a1a2e}
+:root{--p:#0c4a6e;--pd:#000f23;--a:#2dd4bf;--ad:#0d9488;--d:#ef4444;--s:#10b981;--w:#f59e0b;--i:#0ea5e9;--bg:#0a1929;--c:#0f1f33;--t:#e2e8f0;--card:#0f172a}
 body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
-#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg);box-shadow:0 0 60px rgba(0,0,0,.1)}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg);box-shadow:0 0 60px rgba(0,0,0,.3)}
+
+/* LANG TOGGLE */
+.lang-bar{position:fixed;top:0;left:0;right:0;z-index:6000;display:flex;justify-content:center;padding:6px;gap:8px;background:rgba(0,15,35,0.6);backdrop-filter:blur(8px);transition:opacity .3s}
+.lang-bar.hidden{opacity:0;pointer-events:none}
+.lang-btn{padding:6px 16px;border-radius:20px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s}
+.lang-btn.active{background:#fff;color:var(--pd);border-color:#fff}
 
 /* AUTH */
-.auth-screen{position:fixed;inset:0;z-index:5000;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;transition:opacity .5s,transform .5s}
+.auth-screen{position:fixed;inset:0;z-index:5000;background:linear-gradient(180deg,#000f23 0%,#0c4a6e 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px 40px;transition:opacity .5s,transform .5s}
 .auth-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
-.auth-logo{width:90px;height:90px;background:#fff;border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.auth-logo{width:90px;height:90px;background:linear-gradient(135deg,#0c4a6e 0%,#000f23 100%);border-radius:24px;border:2px solid rgba(45,212,191,.3);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);font-size:40px}
 .auth-title{color:#fff;font-size:28px;font-weight:800;margin-bottom:6px}
-.auth-sub{color:rgba(255,255,255,.7);font-size:14px;margin-bottom:32px;text-align:center;line-height:1.6}
-.auth-box{width:100%;max-width:340px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:24px;backdrop-filter:blur(10px)}
-.auth-tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(255,255,255,.1);border-radius:12px;padding:4px}
-.auth-tab{flex:1;padding:10px;border:none;border-radius:10px;background:transparent;color:rgba(255,255,255,.6);font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s}
-.auth-tab.active{background:var(--a);color:var(--pd);box-shadow:0 4px 15px rgba(245,197,24,.3)}
+.auth-sub{color:rgba(148,163,184,.8);font-size:14px;margin-bottom:32px;text-align:center;line-height:1.6}
+.auth-box{width:100%;max-width:340px;background:rgba(15,31,51,.6);border:1px solid rgba(45,212,191,.15);border-radius:20px;padding:24px;backdrop-filter:blur(10px)}
+.auth-tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(0,15,35,.5);border-radius:12px;padding:4px}
+.auth-tab{flex:1;padding:10px;border:none;border-radius:10px;background:transparent;color:rgba(148,163,184,.7);font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s}
+.auth-tab.active{background:linear-gradient(135deg,#2dd4bf 0%,#0ea5e9 100%);color:#000f23;box-shadow:0 4px 15px rgba(45,212,191,.3)}
 .input-g{margin-bottom:14px}
 .input-g label{display:block;color:rgba(255,255,255,.85);font-size:12px;margin-bottom:5px;font-weight:600}
-.input-g input{width:100%;padding:13px 16px;border:2px solid rgba(255,255,255,.15);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-size:15px;font-family:Tajawal,sans-serif;outline:none;transition:all .2s}
-.input-g input:focus{border-color:var(--a);background:rgba(255,255,255,.15)}
-.input-g input::placeholder{color:rgba(255,255,255,.35)}
-.btn-p{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--a) 0%,#e6a800 100%);color:var(--pd);font-size:15px;font-weight:800;font-family:Tajawal;cursor:pointer;box-shadow:0 8px 25px rgba(245,197,24,.3);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.input-g input, .input-g select, .input-g textarea{width:100%;padding:13px 16px;border:2px solid rgba(255,255,255,.15);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-size:15px;font-family:Tajawal,sans-serif;outline:none;transition:all .2s}
+.input-g input:focus, .input-g select:focus, .input-g textarea:focus{border-color:var(--a);background:rgba(45,212,191,.08)}
+.input-g input::placeholder, .input-g textarea::placeholder{color:rgba(148,163,184,.4)}
+.input-g select option{background:#000f23;color:#e2e8f0}
+.btn-p{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#2dd4bf 0%,#0ea5e9 100%);color:#000f23;font-size:15px;font-weight:800;font-family:Tajawal;cursor:pointer;box-shadow:0 8px 25px rgba(45,212,191,.3);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-p:disabled{opacity:.5;cursor:not-allowed}
-.btn-s{width:100%;padding:14px;border:2px solid rgba(255,255,255,.2);border-radius:14px;background:transparent;color:#fff;font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-s{width:100%;padding:14px;border:2px solid rgba(45,212,191,.3);border-radius:14px;background:transparent;color:#2dd4bf;font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s;margin-top:10px}
 .btn-s:hover{background:rgba(255,255,255,.1)}
-.guest-link{display:block;text-align:center;color:rgba(255,255,255,.5);font-size:13px;margin-top:16px;cursor:pointer;text-decoration:underline}
+.guest-link{display:block;text-align:center;color:rgba(148,163,184,.6);font-size:13px;margin-top:16px;cursor:pointer;text-decoration:underline}
 .otp-box{display:flex;gap:10px;justify-content:center;margin:16px 0;direction:ltr}
-.otp-box input{width:48px;height:56px;text-align:center;font-size:24px;font-weight:800;border:2px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-family:Tajawal;outline:none;transition:all .2s}
-.otp-box input:focus{border-color:var(--a);background:rgba(255,255,255,.15);transform:scale(1.05)}
-.otp-timer{color:rgba(255,255,255,.5);font-size:12px;text-align:center;margin-top:8px}
+.otp-box input{width:48px;height:56px;text-align:center;font-size:24px;font-weight:800;border:2px solid rgba(45,212,191,.2);border-radius:14px;background:rgba(45,212,191,.05);color:#2dd4bf;font-family:Tajawal;outline:none;transition:all .2s}
+.otp-box input:focus{border-color:var(--a);background:rgba(45,212,191,.1);transform:scale(1.05)}
+.otp-timer{color:rgba(148,163,184,.6);font-size:12px;text-align:center;margin-top:8px}
 .otp-timer span{color:var(--a);font-weight:700;cursor:pointer}
-.phone-display{background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center;color:#fff;font-size:16px;font-weight:700;margin-bottom:16px;letter-spacing:2px}
+.phone-display{background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);border-radius:12px;padding:12px;text-align:center;color:#2dd4bf;font-size:16px;font-weight:700;margin-bottom:16px;letter-spacing:2px}
 
 /* QR MODAL */
 .qr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:4000;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:20px}
 .qr-overlay.open{opacity:1;pointer-events:auto}
-.qr-modal{background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:360px;text-align:center;transform:scale(.9);transition:transform .3s;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.qr-modal{background:var(--card);border-radius:24px;padding:28px 24px;width:100%;max-width:360px;text-align:center;transform:scale(.9);transition:transform .3s;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative}
 .qr-overlay.open .qr-modal{transform:scale(1)}
-.qr-modal h3{color:var(--p);font-size:20px;margin-bottom:6px}
-.qr-modal p{color:#888;font-size:13px;margin-bottom:20px}
-.qr-box{background:var(--bg);border-radius:16px;padding:20px;margin-bottom:20px;display:flex;justify-content:center}
+.qr-modal h3{color:var(--a);font-size:20px;margin-bottom:6px}
+.qr-modal p{color:#94a3b8;font-size:13px;margin-bottom:20px}
+.qr-box{background:#0a1929;border:1px solid #1e293b;border-radius:16px;padding:20px;margin-bottom:20px;display:flex;justify-content:center;align-items:center;min-height:200px}
 #qrcode img, #qrcode canvas{margin:0 auto;border-radius:8px}
 .qr-link{background:#f0f4fa;border-radius:12px;padding:12px 16px;font-size:13px;color:var(--p);font-weight:600;margin-bottom:16px;word-break:break-all;direction:ltr;text-align:center}
 .qr-actions{display:flex;gap:10px}
 .qr-actions button{flex:1;padding:14px;border:none;border-radius:14px;font-size:14px;font-weight:700;font-family:Tajawal;cursor:pointer;transition:all .2s}
-.qr-copy{background:var(--bg);color:var(--p);border:2px solid #e0e0e0}
-.qr-share{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);color:#fff;box-shadow:0 8px 25px rgba(26,58,122,.3)}
-.qr-close{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.qr-copy{background:#1e293b;color:var(--a);border:2px solid #334155}
+.qr-share{background:linear-gradient(135deg,#0c4a6e 0%,#000f23 100%);color:#fff;box-shadow:0 8px 25px rgba(0,15,35,.5)}
+.qr-close{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.1);border:none;color:#e2e8f0;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+[dir="ltr"] .qr-close{left:auto;right:16px}
 
-/* APP */
-.app-h{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;position:sticky;top:0;z-index:100}
+/* VOICE ALERT BANNER */
+.voice-banner{position:fixed;top:48px;left:12px;right:12px;z-index:550;background:linear-gradient(135deg,#ef4444 0%,#991b1b 100%);color:#fff;padding:14px 16px;border-radius:16px;display:flex;align-items:center;gap:12px;box-shadow:0 10px 40px rgba(239,68,68,.4);transform:translateY(-150%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.voice-banner.show{transform:translateY(0)}
+.voice-banner .v-icon{font-size:28px;animation:pulse 1s infinite}
+.voice-banner .v-text{flex:1}
+.voice-banner .v-text h4{font-size:15px;font-weight:800;margin-bottom:2px}
+.voice-banner .v-text p{font-size:12px;opacity:.9}
+.voice-banner .v-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+/* VOICE SETTINGS */
+.voice-set{position:fixed;bottom:100px;left:12px;z-index:500;background:var(--c);border-radius:16px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--p);transition:transform .3s}
+.voice-set.hidden{transform:translateY(200%)}
+.voice-set input[type="checkbox"]{width:20px;height:20px;accent-color:var(--p)}
+
+/* INSTALL BANNER */
+.install-banner{position:fixed;bottom:90px;left:12px;right:12px;z-index:560;background:var(--c);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:0 10px 40px rgba(0,0,0,.2);transform:translateY(200%);transition:transform .4s cubic-bezier(.4,0,.2,1);border:2px solid var(--a)}
+.install-banner.show{transform:translateY(0)}
+.install-banner .in-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff}
+.install-banner .in-text{flex:1}
+.install-banner .in-text h4{font-size:15px;font-weight:800;color:var(--p);margin-bottom:2px}
+.install-banner .in-text p{font-size:12px;color:#888}
+.install-banner .in-btn{padding:10px 20px;border:none;border-radius:12px;background:linear-gradient(135deg,#2dd4bf 0%,#0ea5e9 100%);color:#000f23;font-weight:700;font-family:Tajawal;cursor:pointer}
+.install-banner .in-close{background:none;border:none;color:#bbb;font-size:18px;cursor:pointer;padding:4px}
+
+/* OFFLINE BANNER */
+.offline-banner{position:fixed;top:48px;left:12px;right:12px;z-index:555;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:10px 16px;border-radius:12px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;transform:translateY(-150%);transition:transform .3s;justify-content:center}
+.offline-banner.show{transform:translateY(0)}
+
+/* APP HEADER */
+.app-h{background:linear-gradient(135deg,#0c4a6e 0%,#000f23 100%);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;position:sticky;top:0;z-index:100}
 .h-btn{background:none;border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
-.notif-badge{position:absolute;top:4px;left:4px;width:18px;height:18px;background:var(--d);border-radius:50%;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--p)}
+.notif-badge{position:absolute;top:4px;left:4px;width:18px;height:18px;background:#ef4444;border-radius:50%;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #0c4a6e}
 .h-title{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800}
+
+/* DRAWER */
 .drawer-o{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
 .drawer-o.open{opacity:1;pointer-events:auto}
-.side-d{position:fixed;top:0;right:0;width:280px;height:100%;background:#fff;z-index:210;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-5px 0 30px rgba(0,0,0,.15)}
+.side-d{position:fixed;top:0;right:0;width:280px;height:100%;background:var(--bg);z-index:210;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-5px 0 30px rgba(0,0,0,.15)}
+[dir="ltr"] .side-d{right:auto;left:0;transform:translateX(-100%)}
+[dir="ltr"] .side-d.open{transform:translateX(0)}
 .side-d.open{transform:translateX(0)}
-.d-h{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);padding:24px 20px 20px;position:relative}
+.d-h{background:linear-gradient(135deg,#0c4a6e 0%,#000f23 100%);padding:24px 20px 20px;position:relative}
 .d-close{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:16px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+[dir="ltr"] .d-close{left:auto;right:12px}
 .d-user{display:flex;align-items:center;gap:14px;margin-top:8px}
 .d-avatar{width:56px;height:56px;border-radius:50%;border:3px solid var(--a);overflow:hidden;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:28px}
 .d-user-info h3{color:#fff;font-size:17px;font-weight:700}
@@ -81,942 +125,1840 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--t);min-heig
 .d-body{flex:1;overflow-y:auto;padding:8px 0}
 .d-sec{font-size:11px;color:#888;font-weight:700;padding:16px 20px 6px}
 .d-item{display:flex;align-items:center;gap:14px;padding:14px 20px;margin:2px 12px;border-radius:14px;cursor:pointer;transition:all .2s;position:relative}
-.d-item:hover,.d-item.active{background:#f0f4fa}
+.d-item:hover,.d-item.active{background:#1e293b}
 .d-item.active::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:4px;height:24px;background:var(--p);border-radius:4px 0 0 4px}
+[dir="ltr"] .d-item.active::before{right:auto;left:0;border-radius:0 4px 4px 0}
 .d-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.d-icon.b{background:#e3f2fd}.d-icon.g{background:#e8f5e9}.d-icon.o{background:#fff3e0}.d-icon.r{background:#ffebee}.d-icon.p{background:#f3e5f5}.d-icon.c{background:#e0f7fa}.d-icon.gr{background:#f5f5f5}.d-icon.y{background:#fff8e1}
+.d-icon.b{background:rgba(14,165,233,.15)}.d-icon.g{background:rgba(16,185,129,.15)}.d-icon.o{background:rgba(245,158,11,.15)}.d-icon.r{background:rgba(239,68,68,.15)}.d-icon.p{background:rgba(139,92,246,.15)}.d-icon.c{background:rgba(45,212,191,.15)}.d-icon.gr{background:#334155}.d-icon.y{background:rgba(245,158,11,.15)}
 .d-text{flex:1}
 .d-text span{display:block;color:var(--p);font-size:14px;font-weight:700}
-.d-text small{display:block;color:#888;font-size:11px;margin-top:2px}
-.d-arrow{color:#bbb;font-size:14px}
-.d-badge{background:var(--d);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
-.d-footer{padding:12px 20px 20px;border-top:1px solid #eee}
-.btn-logout{width:100%;padding:14px;border-radius:14px;border:2px solid #ffebee;background:#fff;color:var(--d);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:Tajawal}
-.ver{text-align:center;color:#bbb;font-size:11px;margin-top:10px}
-.screen{display:none;animation:fadeIn .3s ease}
+.d-text small{display:block;color:#64748b;font-size:11px;margin-top:2px}
+.d-arrow{color:#64748b;font-size:14px}
+.d-badge{background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.d-footer{padding:12px 20px 20px;border-top:1px solid #1e293b}
+.btn-logout{width:100%;padding:14px;border-radius:14px;border:2px solid rgba(239,68,68,.3);background:transparent;color:#ef4444;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:Tajawal}
+.ver{text-align:center;color:#64748b;font-size:11px;margin-top:10px}
+
+/* SCREENS */
+.screen{display:none;animation:fadeIn .3s ease;padding-bottom:90px;min-height:calc(100vh - 60px)}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* HOME */
 .home-c{padding:16px}
-.welcome-c{background:var(--c);border-radius:20px;padding:20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.welcome-c{background:var(--card);border-radius:20px;padding:20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
 .welcome-t h2{color:var(--p);font-size:22px;margin-bottom:4px}
-.welcome-t p{color:#666;font-size:14px}
+.welcome-t p{color:#94a3b8;font-size:14px}
 .avatar{width:52px;height:52px;border-radius:50%;border:3px solid var(--a);display:flex;align-items:center;justify-content:center;font-size:24px;background:#e3f2fd}
-.safety-c{background:var(--c);border-radius:20px;padding:28px 20px;text-align:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06);border:2px solid #2dd4bf}
-.safety-c.warn{border-color:var(--w)}.safety-c.dang{border-color:var(--d)}
+.safety-c{background:var(--card);border-radius:20px;padding:28px 20px;text-align:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06);border:2px solid #2dd4bf;transition:all .3s}
+.safety-c.warn{border-color:#f59e0b}.safety-c.dang{border-color:#ef4444}
 .s-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px}
-.s-icon.safe{background:#e8f5e9}.s-icon.warn{background:#fff8e1}.s-icon.dang{background:#ffebee}
+.s-icon.safe{background:rgba(16,185,129,.15)}.s-icon.warn{background:rgba(245,158,11,.15)}.s-icon.dang{background:rgba(239,68,68,.15)}
 .safety-c h3{font-size:20px;margin-bottom:4px}
-.safety-c h3.safe{color:var(--s)}.safety-c h3.warn{color:var(--w)}.safety-c h3.dang{color:var(--d)}
-.safety-c p{color:#888;font-size:14px}
+.safety-c h3.safe{color:#10b981}.safety-c h3.warn{color:#f59e0b}.safety-c h3.dang{color:#ef4444}
+.safety-c p{color:#94a3b8;font-size:14px}
 .stats-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.stat-c{background:var(--c);border-radius:16px;padding:18px 12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.stat-c{background:var(--card);border-radius:16px;padding:18px 12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.06)}
 .st-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px}
-.st-icon.b{background:#e3f2fd}.st-icon.p{background:#f3e5f5}.st-icon.r{background:#ffebee}.st-icon.c{background:#e0f7fa}
+.st-icon.b{background:rgba(14,165,233,.15)}.st-icon.p{background:rgba(139,92,246,.15)}.st-icon.r{background:rgba(239,68,68,.15)}.st-icon.c{background:rgba(45,212,191,.15)}
 .st-val{font-size:26px;font-weight:800;color:var(--p)}
-.st-unit{font-size:12px;color:#666}
-.st-lbl{font-size:12px;color:#888;margin-top:4px}
+.st-unit{font-size:12px;color:#64748b}
+.st-lbl{font-size:12px;color:#64748b;margin-top:4px}
+.quick-a{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.q-btn{background:var(--card);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.06);border:none;font-family:Tajawal;cursor:pointer;transition:all .2s}
+.q-btn:active{transform:scale(.95)}
+.q-btn .qi{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 8px;background:#1e293b}
+.q-btn span{font-size:11px;font-weight:700;color:var(--t)}
+
+/* MAP */
 #map-c{height:calc(100vh - 130px);position:relative}
 #map{width:100%;height:100%;z-index:1}
-.map-alert{position:absolute;top:12px;left:12px;right:12px;z-index:500;background:rgba(255,255,255,.95);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--d);font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.15)}
-.map-alert-b{background:#ffebee;padding:4px 10px;border-radius:20px;font-size:11px;margin-right:auto}
+.map-alert{position:absolute;top:12px;left:12px;right:12px;z-index:500;background:rgba(15,31,51,.95);border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#ef4444;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.3);transform:translateY(-150%);transition:transform .3s}
+.map-alert.show{transform:translateY(0)}
+.map-alert-b{background:#1e293b;padding:4px 10px;border-radius:20px;font-size:11px;margin-right:auto;white-space:nowrap}
+[dir="ltr"] .map-alert-b{margin-right:0;margin-left:auto}
 .map-ctrl{position:absolute;bottom:100px;left:12px;display:flex;flex-direction:column;gap:8px;z-index:500}
-.map-btn{width:48px;height:48px;border-radius:14px;border:none;background:var(--c);color:var(--p);font-size:20px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center}
+.map-btn{width:48px;height:48px;border-radius:14px;border:none;background:var(--card);color:var(--a);font-size:20px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.map-btn:active{transform:scale(.9)}
 .map-btn.p{background:var(--p);color:#fff}
-.speed-fab{position:absolute;bottom:100px;right:12px;z-index:500;width:72px;height:72px;background:var(--s);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 25px rgba(0,0,0,.2);border:4px solid #fff}
+.speed-fab{position:absolute;bottom:100px;right:12px;z-index:500;width:72px;height:72px;background:var(--s);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 25px rgba(0,0,0,.4);border:4px solid #0f1f33;transition:all .3s}
 .speed-fab.warn{background:var(--w)}.speed-fab.dang{background:var(--d)}
 .speed-fab .spd{font-size:22px;font-weight:800;line-height:1}.speed-fab .u{font-size:10px}
+
+/* REPORT */
 .r-h{background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);padding:14px 16px;display:flex;align-items:center;gap:12px;color:#fff}
-.r-h h2{font-size:18px;flex:1}
+.r-h h2{font-size:18px;flex:1;color:#fff}
 .r-c{padding:20px 16px}
 .sec-t{text-align:center;color:var(--p);margin-bottom:20px;font-size:18px;font-weight:700}
 .hz-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.hz-c{background:var(--c);border-radius:16px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.hz-c{background:var(--card);border-radius:16px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent;box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .hz-c.sel{border-color:var(--a);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.12)}
 .hz-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px}
-.hz-icon.r{background:#ffebee}.hz-icon.b{background:#e3f2fd}.hz-icon.db{background:var(--p);color:#fff}.hz-icon.p{background:#f3e5f5}.hz-icon.o{background:#fff3e0}.hz-icon.c{background:#e0f7fa}.hz-icon.br{background:#efebe9}
+.hz-icon.r{background:rgba(239,68,68,.15)}.hz-icon.b{background:rgba(14,165,233,.15)}.hz-icon.db{background:var(--p);color:#fff}.hz-icon.p{background:rgba(139,92,246,.15)}.hz-icon.o{background:rgba(245,158,11,.15)}.hz-icon.c{background:rgba(45,212,191,.15)}.hz-icon.br{background:#334155}
 .hz-c span{font-size:13px;color:var(--t);font-weight:600}
-.loc-d{background:var(--c);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.loc-d{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .loc-r{display:flex;align-items:center;gap:10px;color:var(--p);font-size:13px;font-weight:600;padding:6px 0}
 .loc-r small{color:#888;font-weight:400}
-.btn-sub{width:100%;padding:18px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-family:Tajawal;box-shadow:0 8px 25px rgba(26,58,122,.3)}
+.form-g{margin-bottom:16px}
+.form-g label{display:block;color:var(--p);font-size:13px;font-weight:700;margin-bottom:6px}
+.form-g textarea, .form-g select{width:100%;padding:13px 16px;border:2px solid #334155;border-radius:14px;background:#1e293b;color:var(--t);font-size:14px;font-family:Tajawal;outline:none;transition:all .2s;resize:vertical;min-height:100px}
+.form-g textarea:focus, .form-g select:focus{border-color:var(--a)}
+.img-up{border:2px dashed #ccc;border-radius:16px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--c)}
+.img-up:hover{border-color:var(--a);background:rgba(45,212,191,.05)}
+.img-up .iu-icon{font-size:32px;color:#bbb;margin-bottom:8px}
+.img-up p{color:#64748b;font-size:13px}
+.img-up.has-img{border-style:solid;border-color:var(--a);background:rgba(45,212,191,.1)}
+.btn-sub{width:100%;padding:18px;border-radius:16px;border:none;background:linear-gradient(135deg,#0c4a6e 0%,#000f23 100%);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-family:Tajawal;box-shadow:0 8px 25px rgba(26,58,122,.3);transition:all .2s}
 .btn-sub:disabled{opacity:.5;cursor:not-allowed}
+.btn-sub:active{transform:scale(.98)}
+
+/* ALERTS */
 .alerts-l{padding:16px}
-.alert-i{background:var(--c);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-right:4px solid transparent;animation:slideIn .4s ease}
+.alert-i{background:var(--card);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-right:4px solid transparent;animation:slideIn .4s ease}
+[dir="ltr"] .alert-i{border-right:none;border-left:4px solid transparent}
 @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.alert-i.dang{border-right-color:var(--d);background:#ffebee}
-.alert-i.warn{border-right-color:var(--w);background:#fff8e1}
-.alert-i.info{border-right-color:var(--i);background:#e3f2fd}
-.alert-i.suc{border-right-color:var(--s);background:#e8f5e9}
+.alert-i.dang{border-right-color:var(--d);background:rgba(239,68,68,.1)}
+[dir="ltr"] .alert-i.dang{border-right:none;border-left-color:var(--d)}
+.alert-i.warn{border-right-color:var(--w);background:rgba(245,158,11,.1)}
+[dir="ltr"] .alert-i.warn{border-right:none;border-left-color:var(--w)}
+.alert-i.info{border-right-color:var(--i);background:rgba(14,165,233,.1)}
+[dir="ltr"] .alert-i.info{border-right:none;border-left-color:var(--i)}
+.alert-i.suc{border-right-color:var(--s);background:rgba(16,185,129,.1)}
+[dir="ltr"] .alert-i.suc{border-right:none;border-left-color:var(--s)}
 .alert-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .alert-inf{flex:1}
 .alert-inf h4{font-size:15px;color:var(--p);margin-bottom:2px}
-.alert-inf p{font-size:13px;color:#555}
-.alert-t{font-size:10px;color:#aaa;margin-top:4px}
+.alert-inf p{font-size:13px;color:#cbd5e1}
+.alert-t{font-size:10px;color:#64748b;margin-top:4px}
 .empty{text-align:center;padding:60px 20px;color:#888}
 .empty .em{font-size:64px;margin-bottom:16px}
-.empty h3{color:var(--p);font-size:18px;margin-bottom:8px}
+.empty h3{color:var(--a);font-size:18px;margin-bottom:8px}
+
+/* REPORTS LIST */
 .reports-l{padding:16px}
-.rep-c{background:var(--c);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);border-right:4px solid var(--p)}
+.rep-c{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.2);border-right:4px solid var(--p)}
+[dir="ltr"] .rep-c{border-right:none;border-left:4px solid var(--p)}
 .rep-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.rep-h .ri{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.rep-h .ri{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(14,165,233,.15)}
 .rep-h .rt{font-weight:700;color:var(--p);font-size:15px}
 .rep-h .rs{margin-right:auto;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:700}
-.rs.pen{background:#fff8e1;color:var(--w)}.rs.con{background:#e8f5e9;color:var(--s)}
-.rep-c p{color:#666;font-size:13px;margin-bottom:8px}
+[dir="ltr"] .rep-h .rs{margin-right:0;margin-left:auto}
+.rs.pen{background:#fff8e1;color:var(--w)}.rs.con{background:#e8f5e9;color:var(--s)}.rs.res{background:#e3f2fd;color:var(--i)}
+.rep-c p{color:#94a3b8;font-size:13px;margin-bottom:8px}
 .rep-c .rl{display:flex;align-items:center;gap:6px;color:#888;font-size:12px}
-.rep-c .rti{color:#bbb;font-size:11px;margin-top:8px;text-align:left}
+.rep-c .rti{color:#475569;font-size:11px;margin-top:8px;text-align:left}
+[dir="rtl"] .rep-c .rti{text-align:right}
+
+/* PROFILE */
 .prof-c{padding:16px}
-.prof-card{background:var(--c);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.prof-card{background:var(--card);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
 .prof-av{width:90px;height:90px;border-radius:50%;border:4px solid var(--a);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:40px;background:#e3f2fd}
 .prof-card h3{color:var(--p);font-size:22px;margin-bottom:4px}
-.prof-card p{color:#888;font-size:14px}
-.lvl{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fff8e1 0%,#ffecb3 100%);color:#f57c00;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;margin-top:10px}
+.prof-card p{color:#94a3b8;font-size:14px}
+.lvl{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(245,158,11,.2) 0%,rgba(245,158,11,.3) 100%);color:#fbbf24;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;margin-top:10px}
 .prof-st{display:flex;justify-content:space-around;background:var(--c);border-radius:20px;padding:20px 16px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
 .p-st{text-align:center}
 .p-st .n{font-size:24px;font-weight:800;color:var(--p);display:block}
-.p-st .l{font-size:12px;color:#888}
-.menu-l{background:var(--c);border-radius:20px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.menu-i{display:flex;align-items:center;padding:18px 20px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background .2s}
-.menu-i:hover{background:#f8f9fa}.menu-i:last-child{border-bottom:none}
-.m-ic{width:40px;text-align:center;font-size:20px}
-.menu-i span:nth-child(2){flex:1;color:var(--t);font-size:15px;font-weight:600}
-.m-ar{color:#ccc;font-size:16px}
-.bot-nav{background:var(--c);display:flex;justify-content:space-around;padding:6px 0 10px;border-top:1px solid #eee;position:sticky;bottom:0;z-index:50}
-.nav-i{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#aaa;font-size:11px;font-family:Tajawal;padding:6px 10px;border-radius:12px;transition:all .2s;flex:1}
-.nav-i.active{color:var(--p);font-weight:700}
-.nav-i.hl{background:linear-gradient(135deg,var(--a) 0%,#e6a800 100%);color:var(--pd);font-weight:700;transform:translateY(-6px);box-shadow:0 8px 20px rgba(245,197,24,.4)}
-.nav-ic{font-size:22px}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--p);color:#fff;padding:14px 24px;border-radius:14px;font-size:14px;font-weight:600;z-index:3000;opacity:0;transition:all .4s;box-shadow:0 10px 40px rgba(0,0,0,.2);white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.suc{background:var(--s)}.toast.err{background:var(--d)}.toast.warn{background:var(--w)}
-.leaflet-control-attribution{font-size:8px!important}
+.p-st .l{font-size:12px;color:#64748b}
+.menu-l{background:var(--card);border-radius:20px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.menu-i{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:all .2s;background:none;border:none;width:100%;font-family:Tajawal;text-align:inherit;font-size:inherit;color:inherit}
+.menu-i:last-child{border-bottom:none}
+.menu-i:hover{background:#1e293b}
+.menu-i .mi{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(14,165,233,.15);color:var(--a);flex-shrink:0}
+.menu-i span{flex:1;font-size:14px;font-weight:600;color:var(--t)}
+.menu-i .arrow{color:#64748b;font-size:14px}
+
+/* SETTINGS */
+.set-c{padding:16px}
+.set-g{background:var(--card);border-radius:20px;padding:8px 0;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.set-i{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #f5f5f5}
+.set-i:last-child{border-bottom:none}
+.set-i .si{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.set-i .st{flex:1}
+.set-i .st h4{font-size:14px;color:#e2e8f0;margin-bottom:2px}
+.set-i .st p{font-size:12px;color:#64748b}
+.toggle{width:48px;height:28px;background:#334155;border-radius:14px;position:relative;cursor:pointer;transition:all .2s;flex-shrink:0}
+.toggle.on{background:linear-gradient(135deg,#2dd4bf 0%,#0ea5e9 100%)}
+.toggle::after{content:"";position:absolute;width:24px;height:24px;background:#fff;border-radius:50%;top:2px;right:2px;transition:all .2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+[dir="ltr"] .toggle::after{right:auto;left:2px}
+.toggle.on::after{right:22px}
+[dir="ltr"] .toggle.on::after{right:auto;left:22px}
+
+/* NOTIFICATIONS */
+.notif-c{padding:16px}
+.notif-i{background:var(--card);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);animation:slideIn .4s ease}
+.notif-i.unread{border-right:4px solid var(--a)}
+[dir="ltr"] .notif-i.unread{border-right:none;border-left:4px solid var(--a)}
+.notif-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:rgba(14,165,233,.15);color:var(--a)}
+.notif-inf{flex:1}
+.notif-inf h4{font-size:14px;color:var(--t);margin-bottom:2px}
+.notif-inf p{font-size:12px;color:#94a3b8}
+.notif-t{font-size:10px;color:#64748b;margin-top:4px}
+
+/* BOTTOM NAV */
+.bot-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);display:flex;justify-content:space-around;padding:8px 0 12px;box-shadow:0 -4px 20px rgba(0,0,0,.3);z-index:100;border-top:1px solid #1e293b;max-width:480px;margin:0 auto}
+.bot-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:#64748b;font-size:10px;font-family:Tajawal;cursor:pointer;transition:all .2s;padding:4px}
+.bot-btn.active{color:var(--a)}
+.bot-btn .bi{font-size:22px;height:24px;display:flex;align-items:center;justify-content:center}
+
+/* TOAST */
+.toast-c{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(200%);z-index:3000;transition:transform .4s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;gap:8px;align-items:center;width:90%;max-width:400px}
+.toast-c.show{transform:translateX(-50%) translateY(0)}
+.toast{padding:14px 20px;border-radius:14px;color:#fff;font-size:14px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,.2);display:flex;align-items:center;gap:10px;animation:toastIn .3s ease;width:100%}
+.toast.suc{background:var(--s)}.toast.dang{background:var(--d)}.toast.info{background:var(--i)}
+@keyframes toastIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+/* ACHIEVEMENTS */
+.ach-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 16px}
+.ach-c{background:var(--c);border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.06);border:2px solid transparent;transition:all .2s}
+.ach-c.earned{border-color:var(--a);background:rgba(45,212,191,.1)}
+.ach-c .ai{font-size:32px;margin-bottom:8px}
+.ach-c h4{font-size:13px;color:var(--t);margin-bottom:4px}
+.ach-c p{font-size:11px;color:#64748b}
+
+/* FAB REPORT */
+.fab-rep{position:fixed;bottom:90px;right:16px;z-index:90;width:56px;height:56px;background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;box-shadow:0 8px 25px rgba(239,68,68,.4);border:none;cursor:pointer;transition:all .2s}
+.fab-rep:active{transform:scale(.9)}
+[dir="ltr"] .fab-rep{right:auto;left:16px}
+
+/* LOADING */
+.loading-o{position:fixed;inset:0;background:rgba(10,25,41,.8);z-index:4500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.loading-o.show{opacity:1;pointer-events:auto}
+.loader{width:48px;height:48px;border:4px solid #1e293b;border-top-color:var(--a);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+
+/* RESPONSIVE */
+@media (max-width:360px){
+  .stats-g{grid-template-columns:1fr 1fr;gap:8px}
+  .stat-c{padding:14px 8px}
+  .st-val{font-size:22px}
+  .quick-a{grid-template-columns:repeat(4,1fr);gap:6px}
+  .q-btn{padding:10px 4px}
+  .hz-g{grid-template-columns:1fr 1fr;gap:8px}
+}
 </style>
 </head>
 <body>
 <div id="app">
 
+<!-- LANGUAGE TOGGLE -->
+<div class="lang-bar" id="langBar">
+  <button class="lang-btn active" data-lang="ar" onclick="App.setLang('ar')">العربية</button>
+  <button class="lang-btn" data-lang="en" onclick="App.setLang('en')">English</button>
+</div>
+
 <!-- AUTH SCREEN -->
 <div class="auth-screen" id="authScreen">
-  <div class="auth-logo" style="padding:10px;background:linear-gradient(135deg,#1a5f7a 0%,#0d3d4a 100%)">
-    <img src="icon-192.png" width="70" height="70" style="border-radius:16px">
-  </div>
-  <div class="auth-title">ERHW</div>
-  <div class="auth-sub">منصة ذكاء السلامة المرورية<br>سجل دخولك أو أنشئ حسابك بخطوة واحدة</div>
-  <div class="auth-box">
+  <div class="auth-logo"><img src="icons/logo.png" style="width:70%;height:70%;object-fit:contain;border-radius:16px"></div>
+  <div class="auth-title" data-i18n="appName">ERHW</div>
+  <div class="auth-sub" data-i18n="authSub">منصة السلامة المرورية<br>للإبلاغ عن المخاطر وتحقيق قيادة آمنة</div>
+
+  <div class="auth-box" id="authBox">
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tabLogin" onclick="switchAuth('login')">تسجيل الدخول</button>
-      <button class="auth-tab" id="tabSignup" onclick="switchAuth('signup')">تسجيل جديد</button>
+      <button class="auth-tab active" onclick="Auth.switchTab('login')" data-i18n="login">تسجيل الدخول</button>
+      <button class="auth-tab" onclick="Auth.switchTab('register')" data-i18n="register">حساب جديد</button>
     </div>
+
+    <!-- LOGIN FORM -->
     <div id="loginForm">
-      <div class="input-g"><label>رقم الهاتف</label><input type="tel" id="loginPhone" placeholder="05xxxxxxxx" maxlength="10"></div>
-      <button class="btn-p" onclick="doLogin()">🚀 دخول للمنصة</button>
-      <button class="btn-s" onclick="doGuest()">الدخول كزائر</button>
+      <div class="input-g">
+        <label data-i18n="phone">رقم الجوال</label>
+        <input type="tel" id="loginPhone" placeholder="05xxxxxxxx" dir="ltr">
+      </div>
+      <div class="input-g">
+        <label data-i18n="password">كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="••••••••">
+      </div>
+      <button class="btn-p" onclick="Auth.login()" data-i18n="loginBtn">دخول</button>
+      <button class="btn-s" onclick="Auth.guestLogin()" data-i18n="guest">الدخول كضيف</button>
     </div>
-    <div id="signupForm" style="display:none">
-      <div class="input-g"><label>الاسم الكامل</label><input type="text" id="regName" placeholder="محمد أحمد"></div>
-      <div class="input-g"><label>رقم الهاتف</label><input type="tel" id="regPhone" placeholder="05xxxxxxxx" maxlength="10"></div>
-      <button class="btn-p" onclick="startSignup()">📱 إرسال رمز التحقق</button>
-      <button class="btn-s" onclick="doGuest()">الدخول كزائر</button>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none">
+      <div class="input-g">
+        <label data-i18n="fullName">الاسم الكامل</label>
+        <input type="text" id="regName" placeholder="محمد أحمد">
+      </div>
+      <div class="input-g">
+        <label data-i18n="phone">رقم الجوال</label>
+        <input type="tel" id="regPhone" placeholder="05xxxxxxxx" dir="ltr">
+      </div>
+      <div class="input-g">
+        <label data-i18n="password">كلمة المرور</label>
+        <input type="password" id="regPass" placeholder="••••••••">
+      </div>
+      <button class="btn-p" onclick="Auth.register()" data-i18n="sendOTP">إرسال رمز التحقق</button>
     </div>
+
+    <!-- OTP FORM -->
     <div id="otpForm" style="display:none">
       <div class="phone-display" id="otpPhoneDisplay">05xxxxxxxx</div>
-      <div class="input-g" style="text-align:center">
-        <label>أدخل رمز التحقق المكون من 4 أرقام</label>
-        <div class="otp-box">
-          <input type="tel" maxlength="1" id="otp1" oninput="otpInput(this,2)" onkeydown="otpBack(event,0)">
-          <input type="tel" maxlength="1" id="otp2" oninput="otpInput(this,3)" onkeydown="otpBack(event,1)">
-          <input type="tel" maxlength="1" id="otp3" oninput="otpInput(this,4)" onkeydown="otpBack(event,2)">
-          <input type="tel" maxlength="1" id="otp4" oninput="otpInput(this,5)" onkeydown="otpBack(event,3)">
-        </div>
-        <div class="otp-timer">لم يصلك الرمز؟ <span onclick="resendOTP()">إعادة الإرسال</span></div>
+      <div class="otp-box">
+        <input type="text" maxlength="1" inputmode="numeric" oninput="Auth.otpInput(this,0)" onkeydown="Auth.otpKey(this,0,event)">
+        <input type="text" maxlength="1" inputmode="numeric" oninput="Auth.otpInput(this,1)" onkeydown="Auth.otpKey(this,1,event)">
+        <input type="text" maxlength="1" inputmode="numeric" oninput="Auth.otpInput(this,2)" onkeydown="Auth.otpKey(this,2,event)">
+        <input type="text" maxlength="1" inputmode="numeric" oninput="Auth.otpInput(this,3)" onkeydown="Auth.otpKey(this,3,event)">
       </div>
-      <button class="btn-p" onclick="verifyOTP()">✅ تأكيد التسجيل</button>
-      <button class="btn-s" onclick="backToSignup()">تعديل الرقم</button>
+      <div class="otp-timer"><span data-i18n="resend">إعادة الإرسال</span> <span id="otpTimer">(60)</span></div>
+      <button class="btn-p" onclick="Auth.verifyOTP()" data-i18n="verify">تحقق</button>
+      <button class="btn-s" onclick="Auth.backToRegister()" data-i18n="back">رجوع</button>
     </div>
   </div>
+  <div style="margin-top:20px;color:rgba(255,255,255,.4);font-size:12px;text-align:center">v1.0.0</div>
 </div>
 
 <!-- QR MODAL -->
-<div class="qr-overlay" id="qrOverlay" onclick="closeQR(event)">
-  <button class="qr-close" onclick="closeQRDirect()">✕</button>
-  <div class="qr-modal">
-    <h3>📲 دعوة صديق</h3>
-    <p>امسح الكود أو شارك الرابط لتسجيل أصدقائك</p>
-    <div class="qr-box"><div id="qrcode"></div></div>
-    <div class="qr-link" id="qrLink">erhw.app/join</div>
+<div class="qr-overlay" id="qrOverlay" onclick="QR.close(event)">
+  <div class="qr-modal" onclick="event.stopPropagation()">
+    <button class="qr-close" onclick="QR.close()">×</button>
+    <h3 data-i18n="shareReport">مشاركة البلاغ</h3>
+    <p data-i18n="scanQR">امسح الكود لمشاهدة التفاصيل</p>
+    <div class="qr-box">
+      <div id="qrcode" style="width:180px;height:180px;display:flex;align-items:center;justify-content:center;font-size:80px">📱</div>
+    </div>
+    <div class="qr-link" id="qrLink">https://erhw.app/r/12345</div>
     <div class="qr-actions">
-      <button class="qr-copy" onclick="copyLink()">📋 نسخ</button>
-      <button class="qr-share" onclick="shareApp()">📤 مشاركة</button>
+      <button class="qr-copy" onclick="QR.copy()" data-i18n="copy">نسخ</button>
+      <button class="qr-share" onclick="QR.share()" data-i18n="share">مشاركة</button>
     </div>
   </div>
 </div>
 
-<!-- Drawer Overlay -->
-<div class="drawer-o" id="drawerO" onclick="closeDrawer()"></div>
-
-<!-- Side Drawer -->
-<div class="side-d" id="sideD">
-  <div class="d-h">
-    <button class="d-close" onclick="closeDrawer()">✕</button>
-    <div class="d-user">
-      <div class="d-avatar" id="dAvatar" style="padding:0"><img src="icon-192.png" width="56" height="56" style="border-radius:50%"></div>
-      <div class="d-user-info">
-        <h3 id="dName">زائر</h3>
-        <p id="dRole">عضو في مجتمع ERHW</p>
-      </div>
-    </div>
-    <div class="d-stats">
-      <div class="d-stat"><div class="n" id="dRep">0</div><div class="l">بلاغاتي</div></div>
-      <div class="d-stat"><div class="n" id="dPts">0</div><div class="l">نقاط</div></div>
-      <div class="d-stat"><div class="n" id="dLvl">1</div><div class="l">مستوى</div></div>
-    </div>
+<!-- VOICE BANNER -->
+<div class="voice-banner" id="voiceBanner">
+  <div class="v-icon">🔊</div>
+  <div class="v-text">
+    <h4 id="voiceTitle">تنبيه!</h4>
+    <p id="voiceMsg">خطر قريب</p>
   </div>
-  <div class="d-body">
-    <div class="d-sec">القائمة الرئيسية</div>
-    <div class="d-item active" onclick="navD('home')">
-      <div class="d-icon b">🏠</div>
-      <div class="d-text"><span>الرئيسية</span><small>نظرة عامة</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-    <div class="d-item" onclick="navD('map')">
-      <div class="d-icon g">🗺️</div>
-      <div class="d-text"><span>الخريطة</span><small>متابعة الطريق</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-    <div class="d-item" onclick="navD('report')">
-      <div class="d-icon o">📤</div>
-      <div class="d-text"><span>بلاغ جديد</span><small>أبلغ عن خطر</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-    <div class="d-item" onclick="navD('alerts')">
-      <div class="d-icon r">🔔</div>
-      <div class="d-text"><span>التنبيهات</span><small>البلاغات النشطة</small></div>
-      <div class="d-badge" id="dBadge">0</div>
-    </div>
-    <div class="d-item" onclick="navD('myreports')">
-      <div class="d-icon p">📋</div>
-      <div class="d-text"><span>بلاغاتي</span><small>سجل مساهماتي</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-    <div class="d-item" onclick="navD('profile')">
-      <div class="d-icon c">👤</div>
-      <div class="d-text"><span>الملف الشخصي</span><small>إدارة الحساب</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-    <div class="d-sec">المجتمع</div>
-    <div class="d-item" onclick="closeDrawer();openQR()">
-      <div class="d-icon y">📲</div>
-      <div class="d-text"><span>دعوة صديق</span><small>شارك التطبيق مع الآخرين</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-    <div class="d-sec">الإعدادات</div>
-    <div class="d-item" onclick="closeDrawer();toast('قيد التطوير','info')">
-      <div class="d-icon gr">⚙️</div>
-      <div class="d-text"><span>الإعدادات</span><small>تخصيص التطبيق</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-    <div class="d-item" onclick="closeDrawer();toast('قيد التطوير','info')">
-      <div class="d-icon gr">❓</div>
-      <div class="d-text"><span>المساعدة</span><small>أسئلة شائعة</small></div>
-      <div class="d-arrow">←</div>
-    </div>
-  </div>
-  <div class="d-footer">
-    <button class="btn-logout" onclick="doLogout()">🚪 تسجيل الخروج</button>
-    <div class="ver">ERHW MVP v3.0</div>
-  </div>
+  <button class="v-close" onclick="Voice.hideBanner()">×</button>
 </div>
 
-<!-- Header -->
-<div class="app-h">
-  <button class="h-btn" onclick="openDrawer()">☰</button>
+<!-- VOICE SETTINGS -->
+
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <div class="in-icon">📲</div>
+  <div class="in-text">
+    <h4 data-i18n="installApp">تثبيت التطبيق</h4>
+    <p data-i18n="installSub">أضفه للشاشة الرئيسية للوصول السريع</p>
+  </div>
+  <button class="in-btn" onclick="PWA.install()" data-i18n="install">تثبيت</button>
+  <button class="in-close" onclick="PWA.hideInstall()">×</button>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div class="offline-banner" id="offlineBanner">
+  <span>📴</span>
+  <span data-i18n="offline">أنت غير متصل بالإنترنت</span>
+</div>
+
+<!-- APP HEADER -->
+<div class="app-h" id="appHeader">
+  <button class="h-btn" onclick="UI.toggleDrawer()">☰</button>
   <div class="h-title">
-    <img src="icon-72.png" width="32" height="32" style="border-radius:8px">
-    ERHW
+    <img src="icons/logo.png" style="width:32px;height:32px;object-fit:contain;border-radius:8px">
+    <span id="headerTitle" data-i18n="home">الرئيسية</span>
   </div>
-  <button class="h-btn" onclick="navD('alerts')">
+  <button class="h-btn" onclick="Router.navigate('notifications')">
     🔔
-    <span class="notif-badge" id="hBadge" style="display:none">0</span>
+    <span class="notif-badge" id="notifBadge" style="display:none">0</span>
   </button>
 </div>
 
-<!-- HOME -->
+<!-- DRAWER -->
+<div class="drawer-o" id="drawerOverlay" onclick="UI.toggleDrawer()"></div>
+<div class="side-d" id="sideDrawer">
+  <div class="d-h">
+    <button class="d-close" onclick="UI.toggleDrawer()">✕</button>
+    <div class="d-user">
+      <div class="d-avatar" id="drawerAvatar" style="padding:4px"><img src="icons/logo.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
+      <div class="d-user-info">
+        <h3 id="drawerName">ضيف</h3>
+        <p id="drawerPhone">--</p>
+      </div>
+    </div>
+    <div class="d-stats">
+      <div class="d-stat">
+        <div class="n" id="drawerReports">0</div>
+        <div class="l" data-i18n="reports">بلاغات</div>
+      </div>
+      <div class="d-stat">
+        <div class="n" id="drawerPoints">0</div>
+        <div class="l" data-i18n="points">نقاط</div>
+      </div>
+      <div class="d-stat">
+        <div class="n" id="drawerRank">--</div>
+        <div class="l" data-i18n="rank">المرتبة</div>
+      </div>
+    </div>
+  </div>
+  <div class="d-body">
+    <div class="d-sec" data-i18n="main">الرئيسية</div>
+    <div class="d-item active" onclick="UI.selectDrawer(this);Router.navigate('home')">
+      <div class="d-icon b">🏠</div>
+      <div class="d-text"><span data-i18n="home">الرئيسية</span><small data-i18n="homeSub">لوحة المعلومات</small></div>
+      <div class="d-arrow">›</div>
+    </div>
+    <div class="d-item" onclick="UI.selectDrawer(this);Router.navigate('map')">
+      <div class="d-icon g">🗺️</div>
+      <div class="d-text"><span data-i18n="map">الخريطة</span><small data-i18n="mapSub">عرض المخاطر</small></div>
+      <div class="d-arrow">›</div>
+    </div>
+    <div class="d-item" onclick="UI.selectDrawer(this);Router.navigate('report')">
+      <div class="d-icon r">⚠️</div>
+      <div class="d-text"><span data-i18n="reportHazard">بلاغ جديد</span><small data-i18n="reportSub">أبلغ عن خطر</small></div>
+      <div class="d-arrow">›</div>
+    </div>
+    <div class="d-item" onclick="UI.selectDrawer(this);Router.navigate('alerts')">
+      <div class="d-icon o">🔔</div>
+      <div class="d-text"><span data-i18n="alerts">التنبيهات</span><small data-i18n="alertsSub">آخر التحذيرات</small></div>
+      <div class="d-arrow">›</div>
+      <span class="d-badge" id="drawerBadge" style="display:none">0</span>
+    </div>
+    <div class="d-sec" data-i18n="account">الحساب</div>
+    <div class="d-item" onclick="UI.selectDrawer(this);Router.navigate('reports')">
+      <div class="d-icon p">📝</div>
+      <div class="d-text"><span data-i18n="myReports">بلاغاتي</span><small data-i18n="myReportsSub">سجل البلاغات</small></div>
+      <div class="d-arrow">›</div>
+    </div>
+    <div class="d-item" onclick="UI.selectDrawer(this);Router.navigate('profile')">
+      <div class="d-icon c">👤</div>
+      <div class="d-text"><span data-i18n="profile">الملف الشخصي</span><small data-i18n="profileSub">الإنجازات والمستوى</small></div>
+      <div class="d-arrow">›</div>
+    </div>
+    <div class="d-item" onclick="UI.selectDrawer(this);Router.navigate('settings')">
+      <div class="d-icon gr">⚙️</div>
+      <div class="d-text"><span data-i18n="settings">الإعدادات</span><small data-i18n="settingsSub">اللغة والتنبيهات</small></div>
+      <div class="d-arrow">›</div>
+    </div>
+  </div>
+  <div class="d-footer">
+    <button class="btn-logout" onclick="Auth.logout()">
+      <span>🚪</span>
+      <span data-i18n="logout">تسجيل الخروج</span>
+    </button>
+    <div class="ver">ERHW v1.0.0</div>
+  </div>
+</div>
+
+<!-- SCREENS -->
+<div id="screensContainer">
+
+<!-- HOME SCREEN -->
 <div class="screen active" id="screen-home">
   <div class="home-c">
     <div class="welcome-c">
       <div class="welcome-t">
-        <h2 id="homeWelcome">أهلاً بك</h2>
-        <p>نظرة عامة على حالة الطريق</p>
+        <h2 id="welcomeName" data-i18n="welcome">أهلاً بك</h2>
+        <p data-i18n="welcomeSub">نحن نعمل لجعل الطرق أكثر أماناً</p>
       </div>
-      <div class="avatar" id="homeAvatar" style="padding:0"><img src="icon-128.png" width="52" height="52" style="border-radius:50%"></div>
+      <div class="avatar" id="homeAvatar" style="padding:4px"><img src="icons/logo.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
     </div>
-    <div class="safety-c" id="safetyStatus">
-      <div class="s-icon safe">✅</div>
-      <h3 class="safe">الطريق آمن</h3>
-      <p>لا توجد بلاغات نشطة في منطقتك</p>
+
+    <div class="safety-c safe" id="safetyCard">
+      <div class="s-icon safe" id="safetyIcon">✅</div>
+      <h3 class="safe" id="safetyTitle" data-i18n="safeRoad">الطريق آمن</h3>
+      <p id="safetyDesc" data-i18n="safeDesc">لا توجد مخاطر مسجلة في منطقتك الحالية</p>
     </div>
+
     <div class="stats-g">
       <div class="stat-c">
-        <div class="st-icon b">📊</div>
-        <div class="st-val" id="stTotal">0</div>
-        <div class="st-lbl">إجمالي البلاغات</div>
+        <div class="st-icon b">🚗</div>
+        <div class="st-val" id="statSpeed">0</div>
+        <div class="st-unit" data-i18n="kmh">كم/س</div>
+        <div class="st-lbl" data-i18n="speed">السرعة</div>
       </div>
       <div class="stat-c">
-        <div class="st-icon p">🛡️</div>
-        <div class="st-val" id="stActive">0</div>
-        <div class="st-lbl">بلاغات نشطة</div>
+        <div class="st-icon p">⭐</div>
+        <div class="st-val" id="statPoints">0</div>
+        <div class="st-unit" data-i18n="pts">نقطة</div>
+        <div class="st-lbl" data-i18n="points">النقاط</div>
       </div>
       <div class="stat-c">
         <div class="st-icon r">⚠️</div>
-        <div class="st-val" id="stDang">0</div>
-        <div class="st-lbl">مخاطر عالية</div>
+        <div class="st-val" id="statHazards">0</div>
+        <div class="st-unit" data-i18n="hazards">خطر</div>
+        <div class="st-lbl" data-i18n="nearby">بالقرب</div>
       </div>
       <div class="stat-c">
-        <div class="st-icon c">👥</div>
-        <div class="st-val" id="stUsers">1</div>
-        <div class="st-lbl">مستخدمون نشطون</div>
+        <div class="st-icon c">🏆</div>
+        <div class="st-val" id="statRank">--</div>
+        <div class="st-unit" data-i18n="rank">المرتبة</div>
+        <div class="st-lbl" data-i18n="global">العالمية</div>
+      </div>
+    </div>
+
+    
+
+    <div style="background:var(--card);border-radius:20px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.2)">
+      <h3 style="color:var(--p);font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        <span>📊</span>
+        <span data-i18n="weeklyStats">إحصائيات الأسبوع</span>
+      </h3>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:100px;padding-top:20px">
+        <div style="flex:1;background:linear-gradient(to top,var(--p),var(--a));border-radius:8px 8px 0 0;height:40%"></div>
+        <div style="flex:1;background:linear-gradient(to top,var(--p),var(--a));border-radius:8px 8px 0 0;height:65%"></div>
+        <div style="flex:1;background:linear-gradient(to top,var(--p),var(--a));border-radius:8px 8px 0 0;height:45%"></div>
+        <div style="flex:1;background:linear-gradient(to top,var(--p),var(--a));border-radius:8px 8px 0 0;height:80%"></div>
+        <div style="flex:1;background:linear-gradient(to top,var(--p),var(--a));border-radius:8px 8px 0 0;height:55%"></div>
+        <div style="flex:1;background:linear-gradient(to top,var(--p),var(--a));border-radius:8px 8px 0 0;height:90%"></div>
+        <div style="flex:1;background:linear-gradient(to top,var(--p),var(--a));border-radius:8px 8px 0 0;height:70%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:#64748b">
+        <span data-i18n="sat">سب</span><span data-i18n="sun">أح</span><span data-i18n="mon">اث</span><span data-i18n="tue">ثل</span><span data-i18n="wed">أر</span><span data-i18n="thu">خم</span><span data-i18n="fri">جم</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MAP -->
+<!-- MAP SCREEN -->
 <div class="screen" id="screen-map">
   <div id="map-c">
     <div id="map"></div>
-    <div class="map-alert" id="mapAlert" style="display:none">
+    <div class="map-alert" id="mapAlert">
       <span>⚠️</span>
-      <span id="mapAlertText">تنبيه أمامك!</span>
-      <span class="map-alert-b" id="mapAlertDist">200 م</span>
+      <span id="mapAlertText">خطر قريب!</span>
+      <span class="map-alert-b" id="mapAlertDist">500 م</span>
     </div>
     <div class="map-ctrl">
-      <button class="map-btn" onclick="locateMe()">📍</button>
-      <button class="map-btn p" onclick="showScreen('report')">📤</button>
+      <button class="map-btn p" onclick="Map.centerUser()" title="موقعي">📍</button>
+      <button class="map-btn" onclick="Map.zoomIn()" title="تكبير">+</button>
+      <button class="map-btn" onclick="Map.zoomOut()" title="تصغير">−</button>
+      <button class="map-btn" onclick="Map.toggleLayer()" title="طبقات">🔄</button>
     </div>
-    <div class="speed-fab" id="speedFab">
-      <span class="spd" id="speedVal">--</span>
-      <span class="u">كم/س</span>
+    <div class="speed-fab safe" id="speedFab">
+      <span class="spd" id="fabSpeed">0</span>
+      <span class="u" data-i18n="kmh">كم/س</span>
     </div>
   </div>
 </div>
 
-<!-- REPORT -->
+<!-- REPORT SCREEN -->
 <div class="screen" id="screen-report">
   <div class="r-h">
-    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
-    <h2>بلاغ جديد</h2>
+    <button class="h-btn" onclick="Router.back()" style="background:rgba(255,255,255,.1)">←</button>
+    <h2 data-i18n="reportHazard">بلاغ عن خطر</h2>
+    <div style="width:40px"></div>
   </div>
   <div class="r-c">
-    <div class="sec-t">اختر نوع الخطر</div>
+    <div class="sec-t" data-i18n="selectHazard">اختر نوع الخطر</div>
     <div class="hz-g">
-      <div class="hz-c" onclick="selectHz(this,'حادث')"><div class="hz-icon r">💥</div><span>حادث مروري</span></div>
-      <div class="hz-c" onclick="selectHz(this,'ماء')"><div class="hz-icon b">💧</div><span>تجمع مياه</span></div>
-      <div class="hz-c" onclick="selectHz(this,'حفرة')"><div class="hz-icon db">🕳️</div><span>حفرة في الطريق</span></div>
-      <div class="hz-c" onclick="selectHz(this,'ضباب')"><div class="hz-icon p">🌫️</div><span>ضباب كثيف</span></div>
-      <div class="hz-c" onclick="selectHz(this,'عمل')"><div class="hz-icon o">🚧</div><span>أعمال صيانة</span></div>
-      <div class="hz-c" onclick="selectHz(this,'حيوان')"><div class="hz-icon c">🐪</div><span>حيوانات على الطريق</span></div>
-      <div class="hz-c" onclick="selectHz(this,'عطل')"><div class="hz-icon br">🚗</div><span>عطل مركبة</span></div>
-      <div class="hz-c" onclick="selectHz(this,'أخرى')"><div class="hz-icon g">⚠️</div><span>أخرى</span></div>
+      <div class="hz-c" data-type="accident" onclick="Report.selectType(this)">
+        <div class="hz-icon r">🚑</div>
+        <span data-i18n="accident">حادث</span>
+      </div>
+      <div class="hz-c" data-type="damage" onclick="Report.selectType(this)">
+        <div class="hz-icon b">🕳️</div>
+        <span data-i18n="damage">تلف بالطريق</span>
+      </div>
+      <div class="hz-c" data-type="traffic" onclick="Report.selectType(this)">
+        <div class="hz-icon db">🚦</div>
+        <span data-i18n="traffic">ازدحام</span>
+      </div>
+      <div class="hz-c" data-type="weather" onclick="Report.selectType(this)">
+        <div class="hz-icon p">🌧️</div>
+        <span data-i18n="weather">طقس</span>
+      </div>
+      <div class="hz-c" data-type="construction" onclick="Report.selectType(this)">
+        <div class="hz-icon o">🚧</div>
+        <span data-i18n="construction">أعمال</span>
+      </div>
+      <div class="hz-c" data-type="other" onclick="Report.selectType(this)">
+        <div class="hz-icon br">⚠️</div>
+        <span data-i18n="other">آخر</span>
+      </div>
     </div>
+
     <div class="loc-d">
-      <div class="loc-r">📍 <span id="repLoc">جارٍ تحديد الموقع...</span></div>
-      <div class="loc-r">📝 <small>سيتم إرفاق موقعك الحالي تلقائياً</small></div>
+      <div class="loc-r">
+        <span>📍</span>
+        <span id="reportLocText" data-i18n="gettingLoc">جاري تحديد الموقع...</span>
+      </div>
+      <div class="loc-r">
+        <span>🕐</span>
+        <span id="reportTime">--</span>
+      </div>
     </div>
-    <button class="btn-sub" id="btnSubmit" onclick="submitReport()" disabled>📤 إرسال البلاغ</button>
+
+    <div class="form-g">
+      <label data-i18n="details">تفاصيل إضافية</label>
+      <textarea id="reportDesc" placeholder="صف الخطر باختصار..."></textarea>
+    </div>
+
+    <div class="form-g">
+      <label data-i18n="photo">صورة (اختياري)</label>
+      <div class="img-up" id="imgUpload" onclick="Report.pickImage()">
+        <div class="iu-icon">📷</div>
+        <p data-i18n="tapUpload">اضغط لإضافة صورة</p>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="Report.handleImage(this)">
+    </div>
+
+    <button class="btn-sub" id="submitReportBtn" onclick="Report.submit()" data-i18n="submitReport">إرسال البلاغ</button>
   </div>
 </div>
 
-<!-- ALERTS -->
+<!-- ALERTS SCREEN -->
 <div class="screen" id="screen-alerts">
   <div class="r-h">
-    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
-    <h2>التنبيهات</h2>
+    <button class="h-btn" onclick="Router.back()" style="background:rgba(255,255,255,.1)">←</button>
+    <h2 data-i18n="alerts">التنبيهات</h2>
+    <div style="width:40px"></div>
   </div>
   <div class="alerts-l" id="alertsList">
-    <div class="empty">
-      <div class="em">🔔</div>
-      <h3>لا توجد تنبيهات</h3>
-      <p>ستظهر هنا البلاغات النشطة في منطقتك</p>
-    </div>
+    <!-- Dynamic content -->
   </div>
 </div>
 
-<!-- MY REPORTS -->
-<div class="screen" id="screen-myreports">
+<!-- MY REPORTS SCREEN -->
+<div class="screen" id="screen-reports">
   <div class="r-h">
-    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
-    <h2>بلاغاتي</h2>
+    <button class="h-btn" onclick="Router.back()" style="background:rgba(255,255,255,.1)">←</button>
+    <h2 data-i18n="myReports">بلاغاتي</h2>
+    <div style="width:40px"></div>
   </div>
   <div class="reports-l" id="myReportsList">
-    <div class="empty">
-      <div class="em">📋</div>
-      <h3>لا توجد بلاغات</h3>
-      <p>لم تقم بإرسال أي بلاغات بعد</p>
-    </div>
+    <!-- Dynamic content -->
   </div>
 </div>
 
-<!-- PROFILE -->
+<!-- PROFILE SCREEN -->
 <div class="screen" id="screen-profile">
-  <div class="r-h">
-    <button class="h-btn" onclick="showScreen('home')" style="background:rgba(255,255,255,.15)">←</button>
-    <h2>الملف الشخصي</h2>
-  </div>
   <div class="prof-c">
     <div class="prof-card">
-      <div class="prof-av" id="profAvatar" style="padding:0"><img src="icon-192.png" width="90" height="90" style="border-radius:50%"></div>
-      <h3 id="profName">زائر</h3>
+      <div class="prof-av" id="profAvatar" style="padding:6px"><img src="icons/logo.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%"></div>
+      <h3 id="profName">ضيف</h3>
       <p id="profPhone">--</p>
-      <div class="lvl" id="profLvl">⭐ المستوى 1</div>
+      <div class="lvl" id="profLevel">
+        <span>⭐</span>
+        <span data-i18n="beginner">مبتدئ</span>
+      </div>
     </div>
+
     <div class="prof-st">
-      <div class="p-st"><span class="n" id="profRep">0</span><span class="l">بلاغات</span></div>
-      <div class="p-st"><span class="n" id="profPts">0</span><span class="l">نقاط</span></div>
-      <div class="p-st"><span class="n" id="profRank">#--</span><span class="l">ترتيب</span></div>
+      <div class="p-st">
+        <span class="n" id="profReports">0</span>
+        <span class="l" data-i18n="reports">بلاغات</span>
+      </div>
+      <div class="p-st">
+        <span class="n" id="profPoints">0</span>
+        <span class="l" data-i18n="points">نقاط</span>
+      </div>
+      <div class="p-st">
+        <span class="n" id="profHelped">0</span>
+        <span class="l" data-i18n="helped">مساعدة</span>
+      </div>
     </div>
+
+    <div style="background:var(--card);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.2)">
+      <h3 style="color:var(--a);font-size:16px;margin-bottom:16px" data-i18n="achievements">الإنجازات</h3>
+      <div class="ach-g" id="achievementsList">
+        <div class="ach-c earned">
+          <div class="ai">🚀</div>
+          <h4 data-i18n="firstStep">البداية</h4>
+          <p data-i18n="firstStepDesc">انضممت للمنصة</p>
+        </div>
+        <div class="ach-c" id="achReporter">
+          <div class="ai">📝</div>
+          <h4 data-i18n="reporter">مراسل</h4>
+          <p data-i18n="reporterDesc">أرسل أول بلاغ</p>
+        </div>
+        <div class="ach-c" id="achHelper">
+          <div class="ai">🤝</div>
+          <h4 data-i18n="helper">مساعد</h4>
+          <p data-i18n="helperDesc">ساعدت 10 سائقين</p>
+        </div>
+        <div class="ach-c" id="achGuardian">
+          <div class="ai">🛡️</div>
+          <h4 data-i18n="guardian">حارس الطريق</h4>
+          <p data-i18n="guardianDesc">50 بلاغ مؤكد</p>
+        </div>
+      </div>
+    </div>
+
     <div class="menu-l">
-      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">📝</span><span>تعديل الملف الشخصي</span><span class="m-ar">‹</span></div>
-      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">🏆</span><span>الإنجازات</span><span class="m-ar">‹</span></div>
-      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">🔔</span><span>إعدادات الإشعارات</span><span class="m-ar">‹</span></div>
-      <div class="menu-i" onclick="openQR()"><span class="m-ic">📲</span><span>دعوة صديق</span><span class="m-ar">‹</span></div>
-      <div class="menu-i" onclick="toast('قيد التطوير','info')"><span class="m-ic">🌙</span><span>الوضع الليلي</span><span class="m-ar">‹</span></div>
+      <button class="menu-i" onclick="Router.navigate('settings')">
+        <div class="mi">⚙️</div>
+        <span data-i18n="settings">الإعدادات</span>
+        <span class="arrow">›</span>
+      </button>
+      <button class="menu-i" onclick="UI.showToast('قريباً','info')">
+        <div class="mi" style="background:#fff8e1;color:var(--w)">📖</div>
+        <span data-i18n="guide">دليل الاستخدام</span>
+        <span class="arrow">›</span>
+      </button>
+      <button class="menu-i" onclick="UI.showToast('قريباً','info')">
+        <div class="mi" style="background:#e8f5e9;color:var(--s)">💬</div>
+        <span data-i18n="support">الدعم الفني</span>
+        <span class="arrow">›</span>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- Bottom Nav -->
-<div class="bot-nav" id="botNav">
-  <button class="nav-i active" id="nav-home" onclick="showScreen('home')"><span class="nav-ic">🏠</span><span>الرئيسية</span></button>
-  <button class="nav-i" id="nav-map" onclick="showScreen('map');setTimeout(initMap,100)"><span class="nav-ic">🗺️</span><span>الخريطة</span></button>
-  <button class="nav-i hl" id="nav-report" onclick="showScreen('report')"><span class="nav-ic">📤</span><span>بلاغ</span></button>
-  <button class="nav-i" id="nav-alerts" onclick="showScreen('alerts')"><span class="nav-ic">🔔</span><span>تنبيهات</span></button>
-  <button class="nav-i" id="nav-profile" onclick="showScreen('profile')"><span class="nav-ic">👤</span><span>حسابي</span></button>
+<!-- SETTINGS SCREEN -->
+<div class="screen" id="screen-settings">
+  <div class="r-h">
+    <button class="h-btn" onclick="Router.back()" style="background:rgba(255,255,255,.1)">←</button>
+    <h2 data-i18n="settings">الإعدادات</h2>
+    <div style="width:40px"></div>
+  </div>
+  <div class="set-c">
+    <div class="set-g">
+      <div class="set-i">
+        <div class="si" style="background:#e3f2fd">🌐</div>
+        <div class="st">
+          <h4 data-i18n="language">اللغة</h4>
+          <p data-i18n="languageSub">تغيير لغة التطبيق</p>
+        </div>
+        <button class="btn-s" style="width:auto;padding:8px 16px;margin:0" onclick="App.toggleLang()" id="langBtn">العربية</button>
+      </div>
+      <div class="set-i">
+        <div class="si" style="background:#e8f5e9">🔔</div>
+        <div class="st">
+          <h4 data-i18n="notifications">الإشعارات</h4>
+          <p data-i18n="notificationsSub">تنبيهات المخاطر القريبة</p>
+        </div>
+        <div class="toggle on" id="notifToggle" onclick="Settings.toggle('notifications')"></div>
+      </div>
+      <div class="set-i">
+        <div class="si" style="background:#fff8e1">🔊</div>
+        <div class="st">
+          <h4 data-i18n="voiceAlerts">التنبيهات الصوتية</h4>
+          <p data-i18n="voiceAlertsSub">إعلام صوتي بالمخاطر</p>
+        </div>
+        <div class="toggle on" id="voiceToggleSet" onclick="Settings.toggle('voice')"></div>
+      </div>
+    </div>
+
+    <div class="set-g">
+      <div class="set-i" onclick="Settings.clearData()" style="cursor:pointer">
+        <div class="si" style="background:#ffebee;color:var(--d)">🗑️</div>
+        <div class="st">
+          <h4 data-i18n="clearData">مسح البيانات</h4>
+          <p data-i18n="clearDataSub">حذف جميع البلاغات المحلية</p>
+        </div>
+        <span class="arrow" style="color:#64748b">›</span>
+      </div>
+      <div class="set-i" onclick="PWA.checkUpdate()" style="cursor:pointer">
+        <div class="si" style="background:#f3e5f5">🔄</div>
+        <div class="st">
+          <h4 data-i18n="checkUpdate">التحقق من التحديثات</h4>
+          <p data-i18n="checkUpdateSub">تحميل أحدث إصدار</p>
+        </div>
+        <span class="arrow" style="color:#64748b">›</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:20px;color:#64748b;font-size:12px">
+      <div>ERHW Road Safety Platform</div>
+      <div>v1.0.0</div>
+      <div style="margin-top:8px">© 2026</div>
+    </div>
+  </div>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<!-- NOTIFICATIONS SCREEN -->
+<div class="screen" id="screen-notifications">
+  <div class="r-h">
+    <button class="h-btn" onclick="Router.back()" style="background:rgba(255,255,255,.1)">←</button>
+    <h2 data-i18n="notifications">الإشعارات</h2>
+    <div style="width:40px"></div>
+  </div>
+  <div class="notif-c" id="notificationsList">
+    <!-- Dynamic -->
+  </div>
+</div>
 
-</div><!-- /app -->
+</div><!-- end screensContainer -->
+
+<!-- BOTTOM NAV -->
+<div class="bot-nav" id="bottomNav">
+  <button class="bot-btn active" data-screen="home" onclick="Router.navigate('home')">
+    <span class="bi">🏠</span>
+    <span data-i18n="home">الرئيسية</span>
+  </button>
+  <button class="bot-btn" data-screen="map" onclick="Router.navigate('map')">
+    <span class="bi">🗺️</span>
+    <span data-i18n="map">الخريطة</span>
+  </button>
+  <button class="bot-btn" data-screen="report" onclick="Router.navigate('report')">
+    <span class="bi">⚠️</span>
+    <span data-i18n="report">بلاغ</span>
+  </button>
+  <button class="bot-btn" data-screen="alerts" onclick="Router.navigate('alerts')">
+    <span class="bi">🔔</span>
+    <span data-i18n="alerts">تنبيهات</span>
+  </button>
+  <button class="bot-btn" data-screen="profile" onclick="Router.navigate('profile')">
+    <span class="bi">👤</span>
+    <span data-i18n="profile">حسابي</span>
+  </button>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-c" id="toastContainer"></div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-o" id="loadingOverlay">
+  <div class="loader"></div>
+</div>
+
+<!-- FAB REPORT (visible on map/home) -->
+<button class="fab-rep" id="fabReport" onclick="Router.navigate('report')">+</button>
+
+</div><!-- end app -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+// ======================
+// TRANSLATIONS
+// ======================
+const i18n = {
+  ar: {
+    appName: "ERHW", authSub: "منصة السلامة المرورية<br>للإبلاغ عن المخاطر وتحقيق قيادة آمنة",
+    login: "تسجيل الدخول", register: "حساب جديد", loginBtn: "دخول", guest: "الدخول كضيف",
+    phone: "رقم الجوال", password: "كلمة المرور", fullName: "الاسم الكامل",
+    sendOTP: "إرسال رمز التحقق", verify: "تحقق", back: "رجوع", resend: "إعادة الإرسال",
+    home: "الرئيسية", homeSub: "لوحة المعلومات", map: "الخريطة", mapSub: "عرض المخاطر",
+    reportHazard: "بلاغ جديد", reportSub: "أبلغ عن خطر", alerts: "التنبيهات", alertsSub: "آخر التحذيرات",
+    myReports: "بلاغاتي", myReportsSub: "سجل البلاغات", profile: "الملف الشخصي", profileSub: "الإنجازات والمستوى",
+    settings: "الإعدادات", settingsSub: "اللغة والتنبيهات", logout: "تسجيل الخروج",
+    welcome: "أهلاً بك", welcomeSub: "نحن نعمل لجعل الطرق أكثر أماناً",
+    safeRoad: "الطريق آمن", safeDesc: "لا توجد مخاطر مسجلة في منطقتك الحالية",
+    speed: "السرعة", kmh: "كم/س", points: "النقاط", pts: "نقطة", hazards: "خطر", nearby: "بالقرب",
+    rank: "المرتبة", global: "العالمية", report: "بلاغ", weeklyStats: "إحصائيات الأسبوع",
+    sat: "سب", sun: "أح", mon: "اث", tue: "ثل", wed: "أر", thu: "خم", fri: "جم",
+    selectHazard: "اختر نوع الخطر", accident: "حادث", damage: "تلف بالطريق", traffic: "ازدحام",
+    weather: "طقس", construction: "أعمال", other: "آخر", gettingLoc: "جاري تحديد الموقع...",
+    details: "تفاصيل إضافية", photo: "صورة (اختياري)", tapUpload: "اضغط لإضافة صورة",
+    submitReport: "إرسال البلاغ", shareReport: "مشاركة البلاغ", scanQR: "امسح الكود لمشاهدة التفاصيل",
+    copy: "نسخ", share: "مشاركة", main: "الرئيسية", account: "الحساب",
+    installApp: "تثبيت التطبيق", installSub: "أضفه للشاشة الرئيسية للوصول السريع", install: "تثبيت",
+    offline: "أنت غير متصل بالإنترنت",
+    language: "اللغة", languageSub: "تغيير لغة التطبيق", notifications: "الإشعارات", notificationsSub: "تنبيهات المخاطر القريبة",
+    voiceAlerts: "التنبيهات الصوتية", voiceAlertsSub: "إعلام صوتي بالمخاطر",
+    clearData: "مسح البيانات", clearDataSub: "حذف جميع البلاغات المحلية",
+    checkUpdate: "التحقق من التحديثات", checkUpdateSub: "تحميل أحدث إصدار",
+    achievements: "الإنجازات", firstStep: "البداية", firstStepDesc: "انضممت للمنصة",
+    reporter: "مراسل", reporterDesc: "أرسل أول بلاغ", helper: "مساعد", helperDesc: "ساعدت 10 سائقين",
+    guardian: "حارس الطريق", guardianDesc: "50 بلاغ مؤكد", beginner: "مبتدئ", helped: "مساعدة",
+    guide: "دليل الاستخدام", support: "الدعم الفني",
+    noAlerts: "لا توجد تنبيهات حالياً", noReports: "لم تقم بإرسال بلاغات بعد",
+    reportSuccess: "تم إرسال البلاغ بنجاح!", reportFail: "يرجى اختيار نوع الخطر",
+    copied: "تم النسخ!", installSuccess: "تم التثبيت بنجاح",
+    voiceTitle: "تنبيه!", voiceMsg: "خطر قريب",
+    confirmClear: "هل أنت متأكد من مسح جميع البيانات؟"
+  },
+  en: {
+    appName: "ERHW", authSub: "Road Safety Platform<br>for reporting hazards and safe driving",
+    login: "Login", register: "Register", loginBtn: "Login", guest: "Guest Login",
+    phone: "Phone Number", password: "Password", fullName: "Full Name",
+    sendOTP: "Send OTP", verify: "Verify", back: "Back", resend: "Resend",
+    home: "Home", homeSub: "Dashboard", map: "Map", mapSub: "View Hazards",
+    reportHazard: "Report Hazard", reportSub: "Report a hazard", alerts: "Alerts", alertsSub: "Latest warnings",
+    myReports: "My Reports", myReportsSub: "Report history", profile: "Profile", profileSub: "Achievements & Level",
+    settings: "Settings", settingsSub: "Language & Alerts", logout: "Logout",
+    welcome: "Welcome", welcomeSub: "Working to make roads safer",
+    safeRoad: "Road is Safe", safeDesc: "No hazards recorded in your current area",
+    speed: "Speed", kmh: "km/h", points: "Points", pts: "pts", hazards: "Hazards", nearby: "Nearby",
+    rank: "Rank", global: "Global", report: "Report", weeklyStats: "Weekly Stats",
+    sat: "Sat", sun: "Sun", mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri",
+    selectHazard: "Select Hazard Type", accident: "Accident", damage: "Road Damage", traffic: "Traffic",
+    weather: "Weather", construction: "Construction", other: "Other", gettingLoc: "Getting location...",
+    details: "Additional Details", photo: "Photo (Optional)", tapUpload: "Tap to add photo",
+    submitReport: "Submit Report", shareReport: "Share Report", scanQR: "Scan code to view details",
+    copy: "Copy", share: "Share", main: "Main", account: "Account",
+    installApp: "Install App", installSub: "Add to home screen for quick access", install: "Install",
+    offline: "You are offline",
+    language: "Language", languageSub: "Change app language", notifications: "Notifications", notificationsSub: "Nearby hazard alerts",
+    voiceAlerts: "Voice Alerts", voiceAlertsSub: "Voice notifications for hazards",
+    clearData: "Clear Data", clearDataSub: "Delete all local reports",
+    checkUpdate: "Check for Updates", checkUpdateSub: "Download latest version",
+    achievements: "Achievements", firstStep: "First Step", firstStepDesc: "Joined the platform",
+    reporter: "Reporter", reporterDesc: "Sent first report", helper: "Helper", helperDesc: "Helped 10 drivers",
+    guardian: "Road Guardian", guardianDesc: "50 confirmed reports", beginner: "Beginner", helped: "Helped",
+    guide: "User Guide", support: "Support",
+    noAlerts: "No alerts currently", noReports: "You haven't sent any reports yet",
+    reportSuccess: "Report submitted successfully!", reportFail: "Please select a hazard type",
+    copied: "Copied!", installSuccess: "Installed successfully",
+    voiceTitle: "Alert!", voiceMsg: "Hazard nearby",
+    confirmClear: "Are you sure you want to clear all data?"
+  }
+};
 
-// ==================== DATA ====================
-let currentUser = null;
-let map = null;
-let userMarker = null;
-let reports = JSON.parse(localStorage.getItem('erhw_reports') || '[]');
-let users = JSON.parse(localStorage.getItem('erhw_users') || '[]');
-let alerts = [];
-let watchId = null;
-let selectedHazard = null;
-let userPos = null;
-let pendingPhone = '';
-let pendingName = '';
-let generatedOTP = '';
-let qrCodeObj = null;
-const APP_URL = 'https://erhw.app/download'; // رابط التحميل (تجريبي)
+// ======================
+// STATE
+// ======================
+const State = {
+  user: JSON.parse(localStorage.getItem('erhw_user')) || null,
+  lang: localStorage.getItem('erhw_lang') || 'ar',
+  settings: JSON.parse(localStorage.getItem('erhw_settings')) || { notifications: true, voice: true },
+  reports: JSON.parse(localStorage.getItem('erhw_reports')) || [],
+  alerts: JSON.parse(localStorage.getItem('erhw_alerts')) || [],
+  notifications: JSON.parse(localStorage.getItem('erhw_notifications')) || [],
+  currentScreen: 'home',
+  history: [],
+  map: null,
+  userMarker: null,
+  hazardMarkers: [],
+  watchId: null,
+  speed: 0,
+  lastPos: null,
+  otpTimer: null,
+  otpCount: 60,
+  deferredPrompt: null,
+  isOnline: navigator.onLine,
 
-// ==================== AUTH SWITCH ====================
-function switchAuth(mode) {
-    document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
-    document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
-    document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
-    document.getElementById('signupForm').style.display = mode === 'signup' ? 'block' : 'none';
-    document.getElementById('otpForm').style.display = 'none';
-}
-function validatePhone(phone) {
-    return /^05\d{8}$/.test(phone);
-}
-
-// ==================== LOGIN ====================
-function doLogin() {
-    const phone = document.getElementById('loginPhone').value.trim();
-    if (!validatePhone(phone)) {
-        toast('الرجاء إدخال رقم هاتف صحيح يبدأ بـ 05', 'err');
-        return;
+  init() {
+    if (this.user) {
+      this.user.points = this.user.points || 0;
+      this.user.reports = this.user.reports || 0;
+      this.user.level = this.user.level || 1;
     }
-    const user = users.find(u => u.phone === phone);
-    if (!user) {
-        toast('رقم الهاتف غير مسجل. أنشئ حساباً جديداً', 'warn');
-        switchAuth('signup');
-        document.getElementById('regPhone').value = phone;
-        return;
-    }
-    currentUser = {
-        name: user.name,
-        phone: user.phone,
-        isGuest: false,
-        reports: user.reports || 0,
-        points: user.points || 0,
-        level: user.level || 1
-    };
-    localStorage.setItem('erhw_user', JSON.stringify(currentUser));
-    initApp();
-    toast('تم تسجيل الدخول! مرحباً ' + currentUser.name, 'suc');
-}
+  },
+  saveUser() { localStorage.setItem('erhw_user', JSON.stringify(this.user)); },
+  saveReports() { localStorage.setItem('erhw_reports', JSON.stringify(this.reports)); },
+  saveAlerts() { localStorage.setItem('erhw_alerts', JSON.stringify(this.alerts)); },
+  saveNotifications() { localStorage.setItem('erhw_notifications', JSON.stringify(this.notifications)); },
+  saveSettings() { localStorage.setItem('erhw_settings', JSON.stringify(this.settings)); }
+};
+State.init();
 
-// ==================== SIGNUP ====================
-function startSignup() {
-    const name = document.getElementById('regName').value.trim();
-    const phone = document.getElementById('regPhone').value.trim();
-    if (!name || name.length < 2) {
-        toast('الرجاء إدخال الاسم الكامل', 'err');
-        return;
+// ======================
+// APP
+// ======================
+const App = {
+  init() {
+    this.setLang(State.lang, false);
+    if (State.user) {
+      Auth.hide();
+      UI.updateUser();
     }
-    if (!validatePhone(phone)) {
-        toast('الرجاء إدخال رقم هاتف صحيح (05xxxxxxxx)', 'err');
-        return;
-    }
-    if (users.find(u => u.phone === phone)) {
-        toast('رقم الهاتف مسجل مسبقاً', 'warn');
-        switchAuth('login');
-        document.getElementById('loginPhone').value = phone;
-        return;
-    }
-    pendingPhone = phone;
-    pendingName = name;
-    generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    console.log('OTP for ' + phone + ': ' + generatedOTP);
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('otpForm').style.display = 'block';
-    document.getElementById('otpPhoneDisplay').textContent = phone;
-    toast('تم إرسال رمز التحقق! (تحقق من Console)', 'suc');
-    setTimeout(() => document.getElementById('otp1').focus(), 300);
-}
+    Router.updateNav();
+    PWA.init();
+    GPS.init();
+    Hazards.init();
+    Alerts.init();
 
-// ==================== OTP ====================
-function otpInput(el, nextId) {
-    el.value = el.value.replace(/[^0-9]/g, '');
-    if (el.value.length === 1 && nextId <= 4) {
-        document.getElementById('otp' + nextId).focus();
-    }
-    if (nextId === 5) verifyOTP();
-}
-function otpBack(e, prevId) {
-    if (e.key === 'Backspace' && e.target.value === '' && prevId >= 1) {
-        document.getElementById('otp' + prevId).focus();
-    }
-}
-function resendOTP() {
-    generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    console.log('New OTP for ' + pendingPhone + ': ' + generatedOTP);
-    toast('تم إعادة الإرسال! (تحقق من Console)', 'suc');
-}
-function verifyOTP() {
-    const otp = document.getElementById('otp1').value + 
-                document.getElementById('otp2').value + 
-                document.getElementById('otp3').value + 
-                document.getElementById('otp4').value;
-    if (otp.length !== 4) {
-        toast('الرجاء إدخال الرمز كاملاً', 'err');
-        return;
-    }
-    if (otp !== generatedOTP) {
-        toast('رمز التحقق غير صحيح', 'err');
-        for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
-        document.getElementById('otp1').focus();
-        return;
-    }
-    const newUser = {
-        name: pendingName,
-        phone: pendingPhone,
-        reports: 0,
-        points: 0,
-        level: 1,
-        createdAt: new Date().toISOString()
-    };
-    users.push(newUser);
-    localStorage.setItem('erhw_users', JSON.stringify(users));
-    currentUser = {
-        name: pendingName,
-        phone: pendingPhone,
-        isGuest: false,
-        reports: 0,
-        points: 0,
-        level: 1
-    };
-    localStorage.setItem('erhw_user', JSON.stringify(currentUser));
-    pendingPhone = '';
-    pendingName = '';
-    generatedOTP = '';
-    document.getElementById('regName').value = '';
-    document.getElementById('regPhone').value = '';
-    for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
-    initApp();
-    toast('🎉 تم إنشاء حسابك بنجاح! مرحباً ' + currentUser.name, 'suc');
-}
-function backToSignup() {
-    document.getElementById('otpForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'block';
-    for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
-}
+    // Demo data if empty
+    if (State.reports.length === 0) this.loadDemoData();
 
-// ==================== GUEST ====================
-function doGuest() {
-    currentUser = {
-        name: 'زائر',
-        phone: '',
-        isGuest: true,
-        reports: 0,
-        points: 0,
-        level: 1
-    };
-    localStorage.setItem('erhw_user', JSON.stringify(currentUser));
-    initApp();
-    toast('تم الدخول كزائر', 'suc');
-}
+    // Update report time
+    setInterval(() => {
+      const el = document.getElementById('reportTime');
+      if (el) el.textContent = new Date().toLocaleString(State.lang === 'ar' ? 'ar-SA' : 'en-US');
+    }, 1000);
+  },
 
-// ==================== INIT APP ====================
-function initApp() {
-    const auth = document.getElementById('authScreen');
-    auth.classList.add('hidden');
-    setTimeout(() => { auth.style.display = 'none'; }, 500);
-    document.getElementById('dName').textContent = currentUser.name;
-    document.getElementById('dRole').textContent = currentUser.isGuest 
-        ? 'زائر في منصة ERHW' 
-        : 'عضو مسجل برقم ' + currentUser.phone;
-    document.getElementById('homeWelcome').textContent = 'أهلاً ' + currentUser.name;
-    document.getElementById('homeAvatar').textContent = '👤';
-    document.getElementById('profName').textContent = currentUser.name;
-    document.getElementById('profPhone').textContent = currentUser.isGuest ? 'زائر' : currentUser.phone;
-    updateStats();
-    updateReportsList();
-    updateAlerts();
-    updateHomeStats();
-    showScreen('home');
-    startLocationTracking();
-}
+  setLang(lang, save = true) {
+    State.lang = lang;
+    if (save) localStorage.setItem('erhw_lang', lang);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
-// ==================== LOGOUT ====================
-function doLogout() {
-    currentUser = null;
-    localStorage.removeItem('erhw_user');
-    const auth = document.getElementById('authScreen');
-    auth.style.display = 'flex';
-    setTimeout(() => { auth.classList.remove('hidden'); }, 10);
-    document.getElementById('loginPhone').value = '';
-    document.getElementById('regName').value = '';
-    document.getElementById('regPhone').value = '';
-    for (let i = 1; i <= 4; i++) document.getElementById('otp' + i).value = '';
-    switchAuth('login');
-    closeDrawer();
-    toast('تم تسجيل الخروج', 'info');
-}
-
-// ==================== QR CODE ====================
-function openQR() {
-    const overlay = document.getElementById('qrOverlay');
-    overlay.classList.add('open');
-    document.getElementById('qrLink').textContent = APP_URL;
-
-    // Generate QR
-    const qrContainer = document.getElementById('qrcode');
-    qrContainer.innerHTML = '';
-    qrCodeObj = new QRCode(qrContainer, {
-        text: APP_URL,
-        width: 180,
-        height: 180,
-        colorDark: '#1a3a7a',
-        colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.M
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
     });
-}
-function closeQR(e) {
-    if (e && e.target !== document.getElementById('qrOverlay')) return;
-    document.getElementById('qrOverlay').classList.remove('open');
-}
-function closeQRDirect() {
-    document.getElementById('qrOverlay').classList.remove('open');
-}
-function copyLink() {
-    navigator.clipboard.writeText(APP_URL).then(() => {
-        toast('تم نسخ الرابط!', 'suc');
-    }).catch(() => {
-        toast('تعذر النسخ', 'err');
-    });
-}
-function shareApp() {
-    const shareData = {
-        title: 'ERHW - منصة السلامة المرورية',
-        text: 'انضم لمنصة ERHW وساهم في السلامة المرورية! 🚗🛡️',
-        url: APP_URL
-    };
-    if (navigator.share) {
-        navigator.share(shareData).catch(() => {});
-    } else {
-        copyLink();
-    }
-}
 
-// ==================== NAVIGATION ====================
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById('screen-' + screenId);
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
-    const navBtn = document.getElementById('nav-' + screenId);
-    if (navBtn) navBtn.classList.add('active');
-    const botNav = document.getElementById('botNav');
-    if (screenId === 'report' || screenId === 'alerts' || screenId === 'myreports' || screenId === 'profile') {
-        botNav.style.display = 'none';
-    } else {
-        botNav.style.display = 'flex';
-    }
-    if (screenId === 'map') setTimeout(initMap, 100);
-}
-
-// ==================== DRAWER ====================
-function openDrawer() {
-    document.getElementById('drawerO').classList.add('open');
-    document.getElementById('sideD').classList.add('open');
-}
-function closeDrawer() {
-    document.getElementById('drawerO').classList.remove('open');
-    document.getElementById('sideD').classList.remove('open');
-}
-function navD(screen) {
-    closeDrawer();
-    showScreen(screen);
-}
-
-// ==================== MAP ====================
-function initMap() {
-    if (map) { map.invalidateSize(); return; }
-    const mapEl = document.getElementById('map');
-    if (!mapEl) return;
-    map = L.map('map').setView([24.7136, 46.6753], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-    reports.forEach(r => {
-        if (r.lat && r.lng) {
-            const color = r.type === 'حادث' ? 'red' : r.type === 'حفرة' ? 'orange' : 'blue';
-            L.circleMarker([r.lat, r.lng], {
-                radius: 10, fillColor: color, color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.8
-            }).addTo(map).bindPopup('<b>' + r.type + '</b><br>' + r.time);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (i18n[lang][key]) {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          el.placeholder = i18n[lang][key];
+        } else {
+          el.innerHTML = i18n[lang][key];
         }
+      }
     });
-    if (userPos) {
-        map.setView([userPos.lat, userPos.lng], 15);
-        userMarker = L.marker([userPos.lat, userPos.lng]).addTo(map);
-    }
-}
-function locateMe() {
-    if (!map || !userPos) return;
-    map.setView([userPos.lat, userPos.lng], 16);
-}
 
-// ==================== LOCATION TRACKING ====================
-function startLocationTracking() {
-    if (!navigator.geolocation) {
-        document.getElementById('repLoc').textContent = 'الموقع غير متوفر';
-        return;
+    const langBtn = document.getElementById('langBtn');
+    if (langBtn) langBtn.textContent = lang === 'ar' ? 'العربية' : 'English';
+
+    Alerts.render();
+    Reports.render();
+    Notifications.render();
+  },
+
+  toggleLang() {
+    this.setLang(State.lang === 'ar' ? 'en' : 'ar');
+  },
+
+  loadDemoData() {
+    const demoHazards = [
+      { id: 'd1', type: 'accident', lat: 24.7136, lng: 46.6753, desc: 'حادث تصادم بسيط', time: Date.now() - 3600000, status: 'confirmed', user: 'system' },
+      { id: 'd2', type: 'damage', lat: 24.7236, lng: 46.6853, desc: 'حفرة في الطريق', time: Date.now() - 7200000, status: 'pending', user: 'system' },
+      { id: 'd3', type: 'traffic', lat: 24.7036, lng: 46.6653, desc: 'ازدحام شديد', time: Date.now() - 1800000, status: 'confirmed', user: 'system' }
+    ];
+    State.reports = demoHazards;
+    State.saveReports();
+
+    const demoAlerts = [
+      { id: 'a1', type: 'dang', title: 'حادث مروري', msg: 'حادث على الدائري الشمالي', time: Date.now() - 300000 },
+      { id: 'a2', type: 'warn', title: 'ازدحام', msg: 'ازدحام قبل جسر الملك فهد', time: Date.now() - 600000 },
+      { id: 'a3', type: 'info', title: 'أعمال صيانة', msg: 'صيانة الطريق حتى الساعة ٨ مساءً', time: Date.now() - 900000 }
+    ];
+    State.alerts = demoAlerts;
+    State.saveAlerts();
+
+    const demoNotifs = [
+      { id: 'n1', title: 'تم تأكيد بلاغك', msg: 'بلاغ الحفرة تم التحقق منه', time: Date.now() - 86400000, read: false },
+      { id: 'n2', title: 'نقاط جديدة', msg: 'حصلت على ١٠ نقاط', time: Date.now() - 172800000, read: true }
+    ];
+    State.notifications = demoNotifs;
+    State.saveNotifications();
+  }
+};
+
+// ======================
+// AUTH
+// ======================
+const Auth = {
+  switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('otpForm').style.display = 'none';
+  },
+
+  login() {
+    const phone = document.getElementById('loginPhone').value;
+    const pass = document.getElementById('loginPass').value;
+    if (!phone || !pass) { UI.showToast('يرجى ملء جميع الحقول', 'dang'); return; }
+
+    UI.showLoading(true);
+    setTimeout(() => {
+      UI.showLoading(false);
+      State.user = { name: 'مستخدم', phone, points: 120, reports: 5, level: 2, isGuest: false };
+      State.saveUser();
+      this.hide();
+      UI.updateUser();
+      UI.showToast('تم تسجيل الدخول', 'suc');
+    }, 1500);
+  },
+
+  register() {
+    const name = document.getElementById('regName').value;
+    const phone = document.getElementById('regPhone').value;
+    const pass = document.getElementById('regPass').value;
+    if (!name || !phone || !pass) { UI.showToast('يرجى ملء جميع الحقول', 'dang'); return; }
+
+    document.getElementById('authBox').dataset.regName = name;
+    document.getElementById('authBox').dataset.regPhone = phone;
+    document.getElementById('authBox').dataset.regPass = pass;
+    document.getElementById('otpPhoneDisplay').textContent = phone;
+
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('otpForm').style.display = 'block';
+
+    this.startOTPTimer();
+    UI.showToast('تم إرسال رمز التحقق', 'suc');
+  },
+
+  startOTPTimer() {
+    State.otpCount = 60;
+    document.getElementById('otpTimer').textContent = '(' + State.otpCount + ')';
+    if (State.otpTimer) clearInterval(State.otpTimer);
+    State.otpTimer = setInterval(() => {
+      State.otpCount--;
+      document.getElementById('otpTimer').textContent = '(' + State.otpCount + ')';
+      if (State.otpCount <= 0) clearInterval(State.otpTimer);
+    }, 1000);
+  },
+
+  otpInput(el, idx) {
+    el.value = el.value.replace(/[^0-9]/g, '');
+    const inputs = document.querySelectorAll('.otp-box input');
+    if (el.value && idx < 3) inputs[idx + 1].focus();
+  },
+
+  otpKey(el, idx, e) {
+    const inputs = document.querySelectorAll('.otp-box input');
+    if (e.key === 'Backspace' && !el.value && idx > 0) inputs[idx - 1].focus();
+  },
+
+  verifyOTP() {
+    const inputs = document.querySelectorAll('.otp-box input');
+    const code = Array.from(inputs).map(i => i.value).join('');
+    if (code.length !== 4) { UI.showToast('أدخل الرمز كاملاً', 'dang'); return; }
+
+    const name = document.getElementById('authBox').dataset.regName;
+    const phone = document.getElementById('authBox').dataset.regPhone;
+
+    UI.showLoading(true);
+    setTimeout(() => {
+      UI.showLoading(false);
+      State.user = { name, phone, points: 0, reports: 0, level: 1, isGuest: false };
+      State.saveUser();
+      this.hide();
+      UI.updateUser();
+      UI.showToast('تم إنشاء الحساب', 'suc');
+    }, 1500);
+  },
+
+  backToRegister() {
+    document.getElementById('otpForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    if (State.otpTimer) clearInterval(State.otpTimer);
+  },
+
+  guestLogin() {
+    State.user = { name: State.lang === 'ar' ? 'ضيف' : 'Guest', phone: '--', points: 0, reports: 0, level: 1, isGuest: true };
+    State.saveUser();
+    this.hide();
+    UI.updateUser();
+    UI.showToast(State.lang === 'ar' ? 'مرحباً بك كضيف' : 'Welcome guest', 'suc');
+  },
+
+  logout() {
+    if (!confirm(State.lang === 'ar' ? 'تأكيد تسجيل الخروج؟' : 'Confirm logout?')) return;
+    State.user = null;
+    State.saveUser();
+    this.show();
+    UI.toggleDrawer();
+    Router.navigate('home');
+  },
+
+  hide() {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('langBar').classList.add('hidden');
+  },
+
+  show() {
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('langBar').classList.remove('hidden');
+  }
+};
+
+// ======================
+// ROUTER
+// ======================
+const Router = {
+  screens: ['home','map','report','alerts','reports','profile','settings','notifications'],
+
+  navigate(screen) {
+    if (screen === State.currentScreen) return;
+    State.history.push(State.currentScreen);
+    this.go(screen);
+  },
+
+  go(screen) {
+    State.currentScreen = screen;
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('screen-' + screen);
+    if (target) target.classList.add('active');
+
+    const titles = { home: 'home', map: 'map', report: 'reportHazard', alerts: 'alerts', 
+                     reports: 'myReports', profile: 'profile', settings: 'settings', notifications: 'notifications' };
+    const titleEl = document.getElementById('headerTitle');
+    if (titleEl && titles[screen]) titleEl.textContent = i18n[State.lang][titles[screen]] || titles[screen];
+
+    this.updateNav();
+
+    const fab = document.getElementById('fabReport');
+    if (fab) fab.style.display = (screen === 'home' || screen === 'map') ? 'flex' : 'none';
+
+    if (screen === 'map') setTimeout(() => Map.init(), 100);
+
+    if (screen === 'alerts') Alerts.render();
+    if (screen === 'reports') Reports.render();
+    if (screen === 'notifications') Notifications.render();
+    if (screen === 'profile') Profile.update();
+
+    window.scrollTo(0, 0);
+  },
+
+  back() {
+    const prev = State.history.pop() || 'home';
+    this.go(prev);
+  },
+
+  updateNav() {
+    document.querySelectorAll('.bot-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.screen === State.currentScreen);
+    });
+    document.querySelectorAll('.d-item').forEach(item => {
+      item.classList.remove('active');
+    });
+  }
+};
+
+// ======================
+// UI
+// ======================
+const UI = {
+  toggleDrawer() {
+    document.getElementById('drawerOverlay').classList.toggle('open');
+    document.getElementById('sideDrawer').classList.toggle('open');
+  },
+
+  selectDrawer(el) {
+    document.querySelectorAll('.d-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    this.toggleDrawer();
+  },
+
+  updateUser() {
+    const u = State.user || { name: 'Guest', phone: '--', points: 0, reports: 0, level: 1 };
+    document.getElementById('drawerName').textContent = u.name;
+    document.getElementById('drawerPhone').textContent = u.phone;
+    document.getElementById('drawerAvatar').textContent = '👤';
+    document.getElementById('drawerReports').textContent = u.reports;
+    document.getElementById('drawerPoints').textContent = u.points;
+    document.getElementById('drawerRank').textContent = u.level;
+
+    document.getElementById('welcomeName').textContent = (State.lang === 'ar' ? 'أهلاً ' : 'Welcome ') + u.name;
+    document.getElementById('homeAvatar').textContent = '👤';
+    document.getElementById('statPoints').textContent = u.points;
+  },
+
+  showToast(msg, type = 'info', duration = 3000) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<span>' + (type === 'suc' ? '✅' : type === 'dang' ? '❌' : 'ℹ️') + '</span><span>' + msg + '</span>';
+    container.appendChild(toast);
+    container.classList.add('show');
+
+    setTimeout(() => {
+      toast.remove();
+      if (container.children.length === 0) container.classList.remove('show');
+    }, duration);
+  },
+
+  showLoading(show) {
+    document.getElementById('loadingOverlay').classList.toggle('show', show);
+  },
+
+  updateBadge(count) {
+    const badge = document.getElementById('notifBadge');
+    const dBadge = document.getElementById('drawerBadge');
+    if (count > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = count;
+      dBadge.style.display = 'inline-block';
+      dBadge.textContent = count;
+    } else {
+      badge.style.display = 'none';
+      dBadge.style.display = 'none';
     }
-    watchId = navigator.geolocation.watchPosition(
-        (pos) => {
-            userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            document.getElementById('repLoc').textContent = userPos.lat.toFixed(4) + ' , ' + userPos.lng.toFixed(4);
-            if (map) {
-                if (!userMarker) {
-                    userMarker = L.marker([userPos.lat, userPos.lng]).addTo(map);
-                } else {
-                    userMarker.setLatLng([userPos.lat, userPos.lng]);
-                }
-            }
-            const speed = pos.coords.speed;
-            const speedFab = document.getElementById('speedFab');
-            const speedVal = document.getElementById('speedVal');
-            if (speedVal) {
-                if (speed !== null && !isNaN(speed)) {
-                    const kmh = Math.round(speed * 3.6);
-                    speedVal.textContent = kmh;
-                    speedFab.classList.remove('warn', 'dang');
-                    if (kmh > 120) speedFab.classList.add('dang');
-                    else if (kmh > 80) speedFab.classList.add('warn');
-                } else {
-                    speedVal.textContent = '--';
-                }
-            }
-            checkNearbyAlerts();
-        },
-        (err) => { document.getElementById('repLoc').textContent = 'تعذر تحديد الموقع'; },
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+  }
+};
+
+// ======================
+// MAP
+// ======================
+const Map = {
+  initialized: false,
+  layerGroup: null,
+
+  init() {
+    if (this.initialized) {
+      setTimeout(() => State.map.invalidateSize(), 200);
+      return;
+    }
+
+    State.map = L.map('map').setView([24.7136, 46.6753], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19
+    }).addTo(State.map);
+
+    this.layerGroup = L.layerGroup().addTo(State.map);
+    this.addHazardMarkers();
+    this.initialized = true;
+
+    if (State.lastPos) {
+      this.updateUserMarker(State.lastPos.lat, State.lastPos.lng);
+    }
+  },
+
+  addHazardMarkers() {
+    if (!this.layerGroup) return;
+    this.layerGroup.clearLayers();
+
+    const icons = {
+      accident: '🔴', damage: '🟤', traffic: '🟠', weather: '🔵', construction: '🟡', other: '⚪'
+    };
+
+    State.reports.forEach(r => {
+      if (!r.lat || !r.lng) return;
+      const marker = L.marker([r.lat, r.lng], {
+        icon: L.divIcon({
+          className: 'hazard-marker',
+          html: '<div style="font-size:28px;text-shadow:0 2px 4px rgba(0,0,0,.3)">' + (icons[r.type] || '⚠️') + '</div>',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(this.layerGroup);
+
+      marker.bindPopup('<b>' + (r.desc || r.type) + '</b><br>' + new Date(r.time).toLocaleString());
+    });
+  },
+
+  updateUserMarker(lat, lng) {
+    if (!State.map) return;
+    if (State.userMarker) State.map.removeLayer(State.userMarker);
+
+    State.userMarker = L.marker([lat, lng], {
+      icon: L.divIcon({
+        className: 'user-marker',
+        html: '<div style="width:16px;height:16px;background:var(--i);border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      })
+    }).addTo(State.map);
+  },
+
+  centerUser() {
+    if (State.lastPos && State.map) {
+      State.map.flyTo([State.lastPos.lat, State.lastPos.lng], 15);
+    } else {
+      UI.showToast(State.lang === 'ar' ? 'جاري تحديد الموقع...' : 'Getting location...', 'info');
+    }
+  },
+
+  zoomIn() { if (State.map) State.map.zoomIn(); },
+  zoomOut() { if (State.map) State.map.zoomOut(); },
+  toggleLayer() { 
+    if (State.map) {
+      UI.showToast(State.lang === 'ar' ? 'تبديل الطبقة' : 'Toggle layer', 'info');
+    }
+  }
+};
+
+// ======================
+// GPS
+// ======================
+const GPS = {
+  init() {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      pos => this.handlePosition(pos),
+      err => console.log('GPS error:', err),
+      { enableHighAccuracy: true }
     );
-}
 
-// ==================== REPORT ====================
-function selectHz(el, type) {
+    State.watchId = navigator.geolocation.watchPosition(
+      pos => this.handlePosition(pos),
+      err => console.log('Watch error:', err),
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+    );
+  },
+
+  handlePosition(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    const speed = position.coords.speed || 0;
+
+    State.lastPos = { lat, lng };
+    State.speed = Math.round(speed * 3.6);
+
+    document.getElementById('statSpeed').textContent = State.speed;
+    document.getElementById('fabSpeed').textContent = State.speed;
+
+    const fab = document.getElementById('speedFab');
+    fab.classList.remove('safe', 'warn', 'dang');
+    if (State.speed > 120) fab.classList.add('dang');
+    else if (State.speed > 80) fab.classList.add('warn');
+    else fab.classList.add('safe');
+
+    if (State.currentScreen === 'map') {
+      Map.updateUserMarker(lat, lng);
+    }
+
+    const locText = document.getElementById('reportLocText');
+    if (locText && locText.dataset.locked !== 'true') {
+      locText.textContent = lat.toFixed(4) + ', ' + lng.toFixed(4);
+      locText.dataset.lat = lat;
+      locText.dataset.lng = lng;
+    }
+
+    this.checkHazards(lat, lng);
+  },
+
+  checkHazards(lat, lng) {
+    const nearby = Hazards.getNearby(lat, lng, 1);
+    document.getElementById('statHazards').textContent = nearby.length;
+
+    if (nearby.length > 0) {
+      const closest = nearby[0];
+      const dist = closest.dist;
+
+      const card = document.getElementById('safetyCard');
+      const icon = document.getElementById('safetyIcon');
+      const title = document.getElementById('safetyTitle');
+      const desc = document.getElementById('safetyDesc');
+
+      card.classList.remove('safe', 'warn', 'dang');
+      icon.classList.remove('safe', 'warn', 'dang');
+      title.classList.remove('safe', 'warn', 'dang');
+
+      if (dist < 0.3) {
+        card.classList.add('dang');
+        icon.classList.add('dang');
+        title.classList.add('dang');
+        icon.textContent = '🔴';
+        title.textContent = i18n[State.lang].voiceTitle || 'تنبيه!';
+        desc.textContent = (i18n[State.lang].voiceMsg || 'خطر قريب') + ' (' + Math.round(dist * 1000) + 'm)';
+
+        const mAlert = document.getElementById('mapAlert');
+        const mText = document.getElementById('mapAlertText');
+        const mDist = document.getElementById('mapAlertDist');
+        if (mAlert && mText && mDist) {
+          mAlert.classList.add('show');
+          mText.textContent = closest.desc || 'خطر قريب!';
+          mDist.textContent = Math.round(dist * 1000) + ' م';
+          setTimeout(() => mAlert.classList.remove('show'), 5000);
+        }
+
+        Voice.speak(closest.desc || 'خطر قريب، يرجى الحذر');
+      } else if (dist < 0.8) {
+        card.classList.add('warn');
+        icon.classList.add('warn');
+        title.classList.add('warn');
+        icon.textContent = '⚠️';
+        title.textContent = State.lang === 'ar' ? 'حذر' : 'Caution';
+        desc.textContent = State.lang === 'ar' ? 'خطر على بعد ' + Math.round(dist * 1000) + ' متر' : 'Hazard in ' + Math.round(dist * 1000) + 'm';
+      }
+    } else {
+      const card = document.getElementById('safetyCard');
+      const icon = document.getElementById('safetyIcon');
+      const title = document.getElementById('safetyTitle');
+      const desc = document.getElementById('safetyDesc');
+      if (card) {
+        card.classList.remove('warn', 'dang');
+        card.classList.add('safe');
+        icon.classList.remove('warn', 'dang');
+        icon.classList.add('safe');
+        title.classList.remove('warn', 'dang');
+        title.classList.add('safe');
+        icon.textContent = '✅';
+        title.textContent = i18n[State.lang].safeRoad || 'الطريق آمن';
+        desc.textContent = i18n[State.lang].safeDesc || 'لا توجد مخاطر مسجلة';
+      }
+    }
+  }
+};
+
+// ======================
+// VOICE
+// ======================
+const Voice = {
+  lastSpeak: 0,
+
+  speak(msg) {
+    if (!State.settings.voice) return;
+    const now = Date.now();
+    if (now - this.lastSpeak < 10000) return;
+    this.lastSpeak = now;
+
+    if ('speechSynthesis' in window) {
+      const u = new SpeechSynthesisUtterance(msg);
+      u.lang = State.lang === 'ar' ? 'ar-SA' : 'en-US';
+      u.rate = 0.9;
+      speechSynthesis.speak(u);
+    }
+
+    const banner = document.getElementById('voiceBanner');
+    document.getElementById('voiceTitle').textContent = i18n[State.lang].voiceTitle || 'تنبيه!';
+    document.getElementById('voiceMsg').textContent = msg;
+    banner.classList.add('show');
+    setTimeout(() => banner.classList.remove('show'), 5000);
+  },
+
+  toggle() {
+    State.settings.voice = document.getElementById('voiceToggle').checked;
+    State.saveSettings();
+    const toggle = document.getElementById('voiceToggleSet');
+    if (toggle) toggle.classList.toggle('on', State.settings.voice);
+  },
+
+  hideBanner() {
+    document.getElementById('voiceBanner').classList.remove('show');
+  }
+};
+
+// ======================
+// HAZARDS
+// ======================
+const Hazards = {
+  init() {},
+
+  getNearby(lat, lng, radiusKm) {
+    return State.reports
+      .filter(r => r.lat && r.lng && r.status !== 'resolved')
+      .map(r => {
+        const d = this.distance(lat, lng, r.lat, r.lng);
+        return { ...r, dist: d };
+      })
+      .filter(r => r.dist <= radiusKm)
+      .sort((a, b) => a.dist - b.dist);
+  },
+
+  distance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  },
+
+  add(report) {
+    State.reports.unshift(report);
+    State.saveReports();
+    Map.addHazardMarkers();
+  }
+};
+
+// ======================
+// REPORT
+// ======================
+const Report = {
+  selectedType: null,
+  imageData: null,
+
+  selectType(el) {
     document.querySelectorAll('.hz-c').forEach(c => c.classList.remove('sel'));
     el.classList.add('sel');
-    selectedHazard = type;
-    document.getElementById('btnSubmit').disabled = false;
-}
-function submitReport() {
-    if (!selectedHazard) { toast('الرجاء اختيار نوع الخطر', 'err'); return; }
-    if (!userPos) { toast('جارٍ تحديد الموقع...', 'warn'); return; }
-    const report = {
-        id: Date.now(),
-        type: selectedHazard,
-        user: currentUser ? currentUser.name : 'زائر',
-        isGuest: currentUser ? currentUser.isGuest : true,
-        lat: userPos.lat,
-        lng: userPos.lng,
-        time: new Date().toLocaleString('ar-SA'),
-        status: 'pending'
+    this.selectedType = el.dataset.type;
+  },
+
+  pickImage() {
+    document.getElementById('fileInput').click();
+  },
+
+  handleImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.imageData = e.target.result;
+      const up = document.getElementById('imgUpload');
+      up.classList.add('has-img');
+      up.innerHTML = '<div style="font-size:32px">✅</div><p>' + (State.lang === 'ar' ? 'تم اختيار الصورة' : 'Image selected') + '</p>';
     };
-    reports.unshift(report);
-    localStorage.setItem('erhw_reports', JSON.stringify(reports));
-    if (currentUser && !currentUser.isGuest) {
-        currentUser.reports++;
-        currentUser.points += 10;
-        if (currentUser.points >= 50) currentUser.level = 2;
-        if (currentUser.points >= 150) currentUser.level = 3;
-        localStorage.setItem('erhw_user', JSON.stringify(currentUser));
-        const uIndex = users.findIndex(u => u.phone === currentUser.phone);
-        if (uIndex >= 0) {
-            users[uIndex].reports = currentUser.reports;
-            users[uIndex].points = currentUser.points;
-            users[uIndex].level = currentUser.level;
-            localStorage.setItem('erhw_users', JSON.stringify(users));
-        }
-    }
-    alerts.unshift({ type: selectedHazard, dist: 'قريب منك', time: 'الآن', level: selectedHazard === 'حادث' ? 'dang' : 'warn' });
-    updateStats();
-    updateReportsList();
-    updateAlerts();
-    updateHomeStats();
-    selectedHazard = null;
-    document.querySelectorAll('.hz-c').forEach(c => c.classList.remove('sel'));
-    document.getElementById('btnSubmit').disabled = true;
-    toast('تم إرسال البلاغ بنجاح! شكراً لمساهمتك', 'suc');
-    setTimeout(() => showScreen('home'), 800);
-}
+    reader.readAsDataURL(file);
+  },
 
-// ==================== STATS & UPDATES ====================
-function updateStats() {
-    const rep = currentUser ? currentUser.reports : 0;
-    const pts = currentUser ? currentUser.points : 0;
-    const lvl = currentUser ? currentUser.level : 1;
-    document.getElementById('dRep').textContent = rep;
-    document.getElementById('dPts').textContent = pts;
-    document.getElementById('dLvl').textContent = lvl;
-    document.getElementById('profRep').textContent = rep;
-    document.getElementById('profPts').textContent = pts;
-    document.getElementById('profLvl').textContent = '⭐ المستوى ' + lvl;
-}
-function updateHomeStats() {
-    document.getElementById('stTotal').textContent = reports.length;
-    document.getElementById('stActive').textContent = reports.filter(r => r.status === 'pending').length;
-    document.getElementById('stDang').textContent = reports.filter(r => r.type === 'حادث').length;
-    const safety = document.getElementById('safetyStatus');
-    const dangCount = reports.filter(r => r.type === 'حادث').length;
-    if (dangCount > 2) {
-        safety.className = 'safety-c dang';
-        safety.innerHTML = '<div class="s-icon dang">🚨</div><h3 class="dang">تحذير! مخاطر عالية</h3><p>يوجد ' + dangCount + ' بلاغات خطرة في المنطقة</p>';
-    } else if (reports.length > 0) {
-        safety.className = 'safety-c warn';
-        safety.innerHTML = '<div class="s-icon warn">⚠️</div><h3 class="warn">انتباه! بلاغات نشطة</h3><p>يوجد ' + reports.length + ' بلاغات في المنطقة</p>';
-    } else {
-        safety.className = 'safety-c';
-        safety.innerHTML = '<div class="s-icon safe">✅</div><h3 class="safe">الطريق آمن</h3><p>لا توجد بلاغات نشطة في منطقتك</p>';
+  submit() {
+    if (!this.selectedType) {
+      UI.showToast(i18n[State.lang].reportFail || 'اختر نوع الخطر', 'dang');
+      return;
     }
-}
-function updateReportsList() {
-    const list = document.getElementById('myReportsList');
-    const myReps = reports.filter(r => currentUser && r.user === currentUser.name);
-    if (myReps.length === 0) {
-        list.innerHTML = '<div class="empty"><div class="em">📋</div><h3>لا توجد بلاغات</h3><p>لم تقم بإرسال أي بلاغات بعد</p></div>';
-        return;
+
+    const locText = document.getElementById('reportLocText');
+    const lat = parseFloat(locText?.dataset.lat) || (State.lastPos?.lat);
+    const lng = parseFloat(locText?.dataset.lng) || (State.lastPos?.lng);
+    const desc = document.getElementById('reportDesc').value;
+
+    if (!lat || !lng) {
+      UI.showToast(State.lang === 'ar' ? 'يرجى السماح بالوصول للموقع' : 'Please allow location access', 'dang');
+      return;
     }
-    list.innerHTML = myReps.map(r => `
-        <div class="rep-c">
-            <div class="rep-h">
-                <div class="ri" style="background:${r.type==='حادث'?'#ffebee':r.type==='حفرة'?'#fff3e0':'#e3f2fd'}">${r.type==='حادث'?'💥':r.type==='حفرة'?'🕳️':'⚠️'}</div>
-                <div class="rt">${r.type}</div>
-                <div class="rs ${r.status==='pending'?'pen':'con'}">${r.status==='pending'?'قيد المراجعة':'مغلق'}</div>
-            </div>
-            <p>${r.lat.toFixed(4)} , ${r.lng.toFixed(4)}</p>
-            <div class="rl">📍 ${r.time}</div>
-        </div>
-    `).join('');
-}
-function updateAlerts() {
+
+    UI.showLoading(true);
+
+    setTimeout(() => {
+      const report = {
+        id: 'r' + Date.now(),
+        type: this.selectedType,
+        lat, lng,
+        desc: desc || this.selectedType,
+        time: Date.now(),
+        status: 'pending',
+        user: State.user?.name || 'guest',
+        image: this.imageData
+      };
+
+      Hazards.add(report);
+
+      if (State.user) {
+        State.user.reports = (State.user.reports || 0) + 1;
+        State.user.points = (State.user.points || 0) + 10;
+        if (State.user.reports >= 50) State.user.level = 5;
+        else if (State.user.reports >= 20) State.user.level = 4;
+        else if (State.user.reports >= 10) State.user.level = 3;
+        else if (State.user.reports >= 5) State.user.level = 2;
+        State.saveUser();
+        UI.updateUser();
+      }
+
+      const notif = {
+        id: 'n' + Date.now(),
+        title: State.lang === 'ar' ? 'بلاغ جديد' : 'New Report',
+        msg: State.lang === 'ar' ? 'تم استلام بلاغك وهو قيد المراجعة' : 'Your report is under review',
+        time: Date.now(),
+        read: false
+      };
+      State.notifications.unshift(notif);
+      State.saveNotifications();
+      UI.updateBadge(State.notifications.filter(n => !n.read).length);
+
+      this.selectedType = null;
+      this.imageData = null;
+      document.querySelectorAll('.hz-c').forEach(c => c.classList.remove('sel'));
+      document.getElementById('reportDesc').value = '';
+      const up = document.getElementById('imgUpload');
+      up.classList.remove('has-img');
+      up.innerHTML = '<div class="iu-icon">📷</div><p data-i18n="tapUpload">اضغط لإضافة صورة</p>';
+
+      UI.showLoading(false);
+      UI.showToast(i18n[State.lang].reportSuccess || 'تم الإرسال', 'suc');
+
+      setTimeout(() => QR.show('https://erhw.app/r/' + report.id), 500);
+    }, 1500);
+  }
+};
+
+// ======================
+// ALERTS
+// ======================
+const Alerts = {
+  init() { this.render(); },
+
+  render() {
     const list = document.getElementById('alertsList');
-    const activeAlerts = alerts.slice(0, 10);
-    document.getElementById('dBadge').textContent = activeAlerts.length;
-    document.getElementById('hBadge').textContent = activeAlerts.length;
-    document.getElementById('hBadge').style.display = activeAlerts.length > 0 ? 'flex' : 'none';
-    if (activeAlerts.length === 0) {
-        list.innerHTML = '<div class="empty"><div class="em">🔔</div><h3>لا توجد تنبيهات</h3><p>ستظهر هنا البلاغات النشطة في منطقتك</p></div>';
-        return;
+    if (!list) return;
+
+    if (State.alerts.length === 0) {
+      list.innerHTML = '<div class="empty"><div class="em">🔔</div><h3 data-i18n="noAlerts">لا توجد تنبيهات</h3></div>';
+      return;
     }
-    list.innerHTML = activeAlerts.map(a => `
-        <div class="alert-i ${a.level}">
-            <div class="alert-ic" style="background:${a.level==='dang'?'#ffebee':a.level==='warn'?'#fff8e1':'#e3f2fd'}">
-                ${a.level==='dang'?'🚨':a.level==='warn'?'⚠️':'ℹ️'}
-            </div>
-            <div class="alert-inf">
-                <h4>${a.type}</h4>
-                <p>${a.dist}</p>
-                <div class="alert-t">${a.time}</div>
-            </div>
-        </div>
-    `).join('');
-}
-function checkNearbyAlerts() {
-    if (!userPos || reports.length === 0) return;
-    let nearest = null;
-    let minDist = Infinity;
-    reports.forEach(r => {
-        if (!r.lat || !r.lng) return;
-        const d = Math.sqrt(Math.pow(r.lat - userPos.lat, 2) + Math.pow(r.lng - userPos.lng, 2));
-        if (d < minDist) { minDist = d; nearest = r; }
-    });
-    const mapAlert = document.getElementById('mapAlert');
-    if (nearest && minDist < 0.01) {
-        mapAlert.style.display = 'flex';
-        document.getElementById('mapAlertText').textContent = nearest.type + ' أمامك!';
-        document.getElementById('mapAlertDist').textContent = Math.round(minDist * 1000) + ' م';
+
+    const typeMap = { dang: ['🔴','#ffebee',i18n[State.lang].accident||'حادث'], warn: ['🟠','#fff8e1',i18n[State.lang].traffic||'ازدحام'], info: ['🔵','#e3f2fd',i18n[State.lang].construction||'أعمال'], suc: ['🟢','#e8f5e9','تم'] };
+
+    list.innerHTML = State.alerts.map(a => {
+      const t = typeMap[a.type] || typeMap.info;
+      const time = new Date(a.time).toLocaleString(State.lang === 'ar' ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+      return '<div class="alert-i ' + a.type + '"><div class="alert-ic" style="background:' + t[1] + '">' + t[0] + '</div><div class="alert-inf"><h4>' + a.title + '</h4><p>' + a.msg + '</p><div class="alert-t">' + time + '</div></div></div>';
+    }).join('');
+  }
+};
+
+// ======================
+// REPORTS
+// ======================
+const Reports = {
+  render() {
+    const list = document.getElementById('myReportsList');
+    if (!list) return;
+
+    const userReports = State.reports.filter(r => r.user === (State.user?.name || 'guest'));
+
+    if (userReports.length === 0) {
+      list.innerHTML = '<div class="empty"><div class="em">📝</div><h3 data-i18n="noReports">لا توجد بلاغات</h3></div>';
+      return;
+    }
+
+    const statusMap = {
+      pending: ['pen', State.lang === 'ar' ? 'قيد المراجعة' : 'Pending'],
+      confirmed: ['con', State.lang === 'ar' ? 'مؤكد' : 'Confirmed'],
+      resolved: ['res', State.lang === 'ar' ? 'تم الحل' : 'Resolved']
+    };
+
+    const typeIcons = { accident: '🚑', damage: '🕳️', traffic: '🚦', weather: '🌧️', construction: '🚧', other: '⚠️' };
+
+    list.innerHTML = userReports.map(r => {
+      const s = statusMap[r.status] || statusMap.pending;
+      const time = new Date(r.time).toLocaleDateString(State.lang === 'ar' ? 'ar-SA' : 'en-US');
+      return '<div class="rep-c"><div class="rep-h"><div class="ri" style="background:#e3f2fd">' + (typeIcons[r.type] || '⚠️') + '</div><span class="rt">' + (r.desc || r.type) + '</span><span class="rs ' + s[0] + '">' + s[1] + '</span></div><p>' + (r.desc || '') + '</p><div class="rl"><span>📍</span><small>' + (r.lat ? r.lat.toFixed(4) + ',' + r.lng.toFixed(4) : '--') + '</small></div><div class="rti">' + time + '</div></div>';
+    }).join('');
+  }
+};
+
+// ======================
+// NOTIFICATIONS
+// ======================
+const Notifications = {
+  render() {
+    const list = document.getElementById('notificationsList');
+    if (!list) return;
+
+    if (State.notifications.length === 0) {
+      list.innerHTML = '<div class="empty"><div class="em">🔔</div><h3>لا توجد إشعارات</h3></div>';
+      return;
+    }
+
+    list.innerHTML = State.notifications.map(n => {
+      const time = new Date(n.time).toLocaleString(State.lang === 'ar' ? 'ar-SA' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      return '<div class="notif-i ' + (n.read ? '' : 'unread') + '" onclick="Notifications.markRead(' + n.id + ')"><div class="notif-ic">🔔</div><div class="notif-inf"><h4>' + n.title + '</h4><p>' + n.msg + '</p><div class="notif-t">' + time + '</div></div></div>';
+    }).join('');
+
+    setTimeout(() => {
+      State.notifications.forEach(n => n.read = true);
+      State.saveNotifications();
+      UI.updateBadge(0);
+    }, 1000);
+  },
+
+  markRead(id) {
+    const n = State.notifications.find(x => x.id === id);
+    if (n) { n.read = true; State.saveNotifications(); this.render(); }
+  }
+};
+
+// ======================
+// PROFILE
+// ======================
+const Profile = {
+  update() {
+    const u = State.user || { name: 'Guest', points: 0, reports: 0, level: 1 };
+    document.getElementById('profName').textContent = u.name;
+    document.getElementById('profPhone').textContent = u.phone || '--';
+    document.getElementById('profAvatar').textContent = '👤';
+    document.getElementById('profReports').textContent = u.reports || 0;
+    document.getElementById('profPoints').textContent = u.points || 0;
+    document.getElementById('profHelped').textContent = Math.floor((u.reports || 0) * 2.5);
+
+    const levels = [State.lang === 'ar' ? 'مبتدئ' : 'Beginner', State.lang === 'ar' ? 'نشط' : 'Active', State.lang === 'ar' ? 'خبير' : 'Expert', State.lang === 'ar' ? 'محترف' : 'Pro', State.lang === 'ar' ? 'أسطورة' : 'Legend'];
+    const lvl = Math.min((u.level || 1) - 1, levels.length - 1);
+    document.getElementById('profLevel').innerHTML = '<span>⭐</span><span>' + levels[lvl] + '</span>';
+
+    document.getElementById('achReporter').classList.toggle('earned', (u.reports || 0) >= 1);
+    document.getElementById('achHelper').classList.toggle('earned', (u.reports || 0) >= 10);
+    document.getElementById('achGuardian').classList.toggle('earned', (u.reports || 0) >= 50);
+  }
+};
+
+// ======================
+// SETTINGS
+// ======================
+const Settings = {
+  toggle(key) {
+    State.settings[key] = !State.settings[key];
+    State.saveSettings();
+
+    const el = key === 'notifications' ? document.getElementById('notifToggle') : document.getElementById('voiceToggleSet');
+    if (el) el.classList.toggle('on', State.settings[key]);
+
+    if (key === 'voice') {
+      document.getElementById('voiceToggle').checked = State.settings.voice;
+    }
+  },
+
+  clearData() {
+    if (!confirm(i18n[State.lang].confirmClear || 'هل أنت متأكد؟')) return;
+    State.reports = [];
+    State.alerts = [];
+    State.notifications = [];
+    State.saveReports();
+    State.saveAlerts();
+    State.saveNotifications();
+    UI.updateBadge(0);
+    UI.showToast('تم مسح البيانات', 'suc');
+  }
+};
+
+// ======================
+// QR
+// ======================
+const QR = {
+  show(link) {
+    document.getElementById('qrLink').textContent = link;
+    const box = document.getElementById('qrcode');
+    box.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(link) + '" style="width:180px;height:180px;border-radius:8px" alt="QR">';
+    document.getElementById('qrOverlay').classList.add('open');
+  },
+
+  close(e) {
+    if (e && e.target !== document.getElementById('qrOverlay')) return;
+    document.getElementById('qrOverlay').classList.remove('open');
+  },
+
+  copy() {
+    const link = document.getElementById('qrLink').textContent;
+    navigator.clipboard.writeText(link).then(() => UI.showToast(i18n[State.lang].copied || 'تم النسخ', 'suc'));
+  },
+
+  share() {
+    const link = document.getElementById('qrLink').textContent;
+    if (navigator.share) {
+      navigator.share({ title: 'ERHW Report', url: link });
     } else {
-        mapAlert.style.display = 'none';
+      this.copy();
     }
-}
+  }
+};
 
-// ==================== TOAST ====================
-function toast(msg, type) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast ' + (type || '');
-    setTimeout(() => t.classList.add('show'), 10);
-    setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// ==================== ON LOAD ====================
-window.addEventListener('load', () => {
-    const saved = localStorage.getItem('erhw_user');
-    if (saved) {
-        currentUser = JSON.parse(saved);
-        initApp();
+// ======================
+// PWA
+// ======================
+const PWA = {
+  init() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('SW registered');
+      }).catch(err => console.log('SW error:', err));
     }
-    updateHomeStats();
-    document.getElementById('hBadge').style.display = 'none';
-});
-window.addEventListener('beforeunload', () => {
-    if (watchId) navigator.geolocation.clearWatch(watchId);
-});
-</script>
 
-<script>
-// Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('SW registered'))
-      .catch(err => console.log('SW error', err));
-  });
-}
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      State.deferredPrompt = e;
+      setTimeout(() => document.getElementById('installBanner').classList.add('show'), 2000);
+    });
+
+    window.addEventListener('online', () => this.updateOnline(true));
+    window.addEventListener('offline', () => this.updateOnline(false));
+    this.updateOnline(navigator.onLine);
+  },
+
+  install() {
+    if (!State.deferredPrompt) return;
+    State.deferredPrompt.prompt();
+    State.deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        UI.showToast(i18n[State.lang].installSuccess || 'تم التثبيت', 'suc');
+      }
+      State.deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  },
+
+  hideInstall() {
+    document.getElementById('installBanner').classList.remove('show');
+  },
+
+  updateOnline(online) {
+    State.isOnline = online;
+    document.getElementById('offlineBanner').classList.toggle('show', !online);
+  },
+
+  checkUpdate() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.update();
+        UI.showToast(State.lang === 'ar' ? 'جاري التحقق...' : 'Checking...', 'info');
+      });
+    }
+  }
+};
+
+// ======================
+// INIT
+// ======================
+document.addEventListener('DOMContentLoaded', () => {
+  App.init();
+
+  const unread = State.notifications.filter(n => !n.read).length;
+  UI.updateBadge(unread);
+
+  const rt = document.getElementById('reportTime');
+  if (rt) rt.textContent = new Date().toLocaleString(State.lang === 'ar' ? 'ar-SA' : 'en-US');
+});
 </script>
 </body>
 </html>

@@ -1,67 +1,33 @@
 {
-  "name": "ERHW - منصة السلامة المرورية",
+  "name": "ERHW - Road Safety Platform",
   "short_name": "ERHW",
-  "start_url": "/",
+  "description": "Road Safety Platform for reporting hazards and safe driving",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#1a3a7a",
-  "theme_color": "#1a3a7a",
+  "background_color": "#000f23",
+  "theme_color": "#000f23",
   "orientation": "portrait",
   "scope": "/",
   "lang": "ar",
-  "dir": "rtl",
   "icons": [
     {
-      "src": "icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-192.png",
+      "src": "icons/logo-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
+      "src": "icons/logo-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
+  "categories": ["navigation", "utilities"],
   "screenshots": [
     {
-      "src": "screenshot-1.png",
-      "sizes": "480x800",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "screenshot-2.png",
-      "sizes": "480x800",
+      "src": "icons/logo-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow"
     }
